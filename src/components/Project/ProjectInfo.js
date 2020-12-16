@@ -11,7 +11,7 @@ class ProjectInfoSection extends Component {
                         <Heading textAlign="left" size="2xl" mt="10px">Project Title</Heading>
                         <Icon name="edit" size="24px" mt="20px"/>
                     </Stack>
-                        <Text ml="8%" pt="2%">
+                        <Text ml="8%" pt="2%" textAlign="left">
                             Lorem ipsum is placeholder text commonly used in the graphic, print, and
                             publishing industries for previewing layouts and visual mockups.Lorem ipsum is placeholder text commonly used in the graphic, print, and
                             publishing industries for previewing layouts and visual mockups.Lorem ipsum is placeholder text commonly used in the graphic, print, and
@@ -23,7 +23,8 @@ class ProjectInfoSection extends Component {
                         <Heading textAlign="left" ml="8%" mt="1%" as="h6" size="s">
                             Created By
                         </Heading>
-                        <Avatar src="https://bit.ly/broken-link" ml="8%" mt="1%" size="2xl"/>
+                        <Stack>
+                        <Avatar src="https://bit.ly/broken-link" ml="8%" mt="1%" size="2xl" alignItems="left"/>
                         <Stack isInline spacing="auto" mr="30px">
                         <Heading textAlign="left" ml="8%" mt="1%" as="h3" size="lg">
                             Bilal Zubairi
@@ -32,9 +33,10 @@ class ProjectInfoSection extends Component {
                             Close Project
                         </Button>
                         </Stack>
-                        <Text fontSize="sm" ml="8%" mt="1px">
+                        <Text fontSize="sm" ml="8%" mt="1px" textAlign="left">
                             Created on 24/10/20
                         </Text>
+                        </Stack>
                     </Box>
                 </Grid>
             </Box>
