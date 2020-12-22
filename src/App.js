@@ -6,14 +6,23 @@ import ProjectMembersSection from './components/Project/ProjectMembers';
 import ProjectPositionsSection from './components/Project/ProjectPositions';
 import DiscussionSection from './components/Project/Discussions';
 import Kanban from './components/Kanban';
+import {BrowserRouter as Router ,Route, Switch} from 'react-router-dom';
 import './App.css';
 
 function App() {
   return (
     <div className="App">
-      <HeaderBar />
-      <Navbar />
-      <ProjectMembersSection />
+      <HeaderBar />  
+      <Router>
+        <Navbar />
+          <Switch>
+            <Route exact path='/info' component={ProjectInfoSection}  />
+            <Route exact path='/member' component={ProjectMembersSection}  />
+            <Route exact path='/position' component={ProjectPositionsSection}  />
+            <Route exact path='/kanban' component={Kanban}  />
+            <Route exact path='/disccussion' component={DiscussionSection}  />
+          </Switch>
+      </Router>
     </div>
   );
 }

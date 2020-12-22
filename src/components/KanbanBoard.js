@@ -57,11 +57,11 @@ class KanbanBoard extends React.Component {
       this.handleOnDragEnter = this.handleOnDragEnter.bind(this);
       this.handleOnDragEnd = this.handleOnDragEnd.bind(this);
       this.columns = [
-        { name: "Planning", stage: 1 },
-        { name: "Design", stage: 2 },
-        { name: "In Progress", stage: 3 },
+        { name: "To do", stage: 1 },
+        { name: "Doing", stage: 2 },
+        { name: "Done", stage: 3 },
         { name: "Testing", stage: 4 },
-        { name: "Launch", stage: 5 }
+        { name: "Completed", stage: 5 }
       ];
     }
   
