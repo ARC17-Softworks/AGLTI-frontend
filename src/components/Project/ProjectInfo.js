@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
-import { Box, Grid, Heading, Text, Divider, Avatar, Button, Stack, Icon } from "@chakra-ui/core";
+import { Box, Grid, Heading, Text, Divider, Avatar, Button, Stack, Icon, useDisclosure } from "@chakra-ui/core";
+import { Fade, ScaleFade, Slide, SlideFade } from "@chakra-ui/react";
 
-class ProjectInfoSection extends Component {
-    render() {
+function ProjectInfoSection() {
+    const { isOpen, onToggle } = useDisclosure()
+
         return (
             <Box zIndex={-1} position= "absolute" bg="#171923" h="100vh" color="white" >
                 <Grid templateColumns="repeat(1, 2fr)">
+                <Fade in={!isOpen}>
                     <Box h="80vh" w="80%" ml="8%" mt="6%" borderRadius="lg" bg="#2D3748" >
                     <Stack isInline spacing="auto" ml="8%" mr="40px">
                         <Heading textAlign="left" size="2xl" mt="10px">Project Title</Heading>
@@ -29,7 +32,7 @@ class ProjectInfoSection extends Component {
                         <Heading textAlign="left" ml="8%" mt="1%" as="h3" size="lg">
                             Bilal Zubairi
                         </Heading>
-                        <Button variantColor="red" size="md" >
+                        <Button variantColor="red" size="md" onClick={onToggle}>
                             Close Project
                         </Button>
                         </Stack>
@@ -38,10 +41,10 @@ class ProjectInfoSection extends Component {
                         </Text>
                         </Stack>
                     </Box>
+                    </Fade>
                 </Grid>
             </Box>
         )
     }
-}
 
 export default ProjectInfoSection
