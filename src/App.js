@@ -4,7 +4,7 @@ import Navbar from './components/Navbar';
 import ProjectInfoSection from './components/Project/ProjectInfo';
 import ProjectMembersSection from './components/ProjectMembersPage/ProjectMembers';
 import ProjectPositionsSection from './components/ProjectPositionsPage/ProjectPositions';
-import DiscussionSection from './components/Project/Discussions';
+import DiscussionSection from './components/DiscussionPage/Discussions';
 import Kanban from './components/Kanban';
 import {BrowserRouter as Router ,Route, Switch} from 'react-router-dom';
 import './App.css';
