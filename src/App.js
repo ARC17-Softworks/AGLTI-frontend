@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import HeaderBar from './components/HeaderSection';
 import Navbar from './components/Navbar';
 import ProjectInfoSection from './components/Project/ProjectInfo';
-import ProjectMembersSection from './components/Project/ProjectMembers';
+import ProjectMembersSection from './components/ProjectMembersPage/ProjectMembers';
 import ProjectPositionsSection from './components/Project/ProjectPositions';
 import DiscussionSection from './components/Project/Discussions';
 import Kanban from './components/Kanban';
