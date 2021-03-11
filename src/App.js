@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import Login from './components/auth/Login';
+import Register from './components/auth/Register';
 import HeaderBar from './components/HeaderSection';
 import Navbar from './components/Navbar';
 import ProjectInfoSection from './components/Project/ProjectInfo';
@@ -13,7 +14,7 @@ import './App.css';
 function App() {
   return (
     <div className="App">
-      <Login />
+      <Register />
       {/* <HeaderBar />  
       <Router>
         <Navbar />
