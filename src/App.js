@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import Login from './components/auth/Login';
 import HeaderBar from './components/HeaderSection';
 import Navbar from './components/Navbar';
 import ProjectInfoSection from './components/Project/ProjectInfo';
@@ -12,7 +13,8 @@ import './App.css';
 function App() {
   return (
     <div className="App">
-      <HeaderBar />  
+      <Login />
+      {/* <HeaderBar />  
       <Router>
         <Navbar />
           <Switch>
@@ -22,7 +24,7 @@ function App() {
             <Route exact path='/kanban' component={Kanban}  />
             <Route exact path='/disccussion' component={DiscussionSection}  />
           </Switch>
-      </Router>
+      </Router> */}
     </div>
   );
 }
