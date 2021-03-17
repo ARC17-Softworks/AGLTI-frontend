@@ -1,26 +1,44 @@
 import React, { Component } from 'react';
-import './style.css';
-import { gql } from 'apollo-boost';  //for get
+import {flowRight as compose} from 'lodash';
+import {LOGIN_USER} from '../../queries/queries';
 import { graphql } from 'react-apollo';  // for binding
-
-const login = gql`
-    {
-        Project{
-            owner
-            title
-            description
-        }
-    }
-`
-
+import './style.css';
 
 class Login extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+        email:'',
+        password:''
+    }
+  }
 
-    render() {
-        return (
-            <div className='form-container'>
-      <h1>Account <span className='text-primary'>Login</span> </h1>
-      <form>
+  submitForm(e){
+    e.preventDefault();
+    this.props.LOGIN_USER({
+        variables: {
+            email:this.state.email,
+            password:this.state.password
+        }
+    })
+    console.log(e.target.value);
+  }
+
+  render(){
+  return(
+     <div>
+       <h1>Account <span className='text-primary'>Login</span> </h1>
+       <div className='form-container'>
+       <form onSubmit={this.submitForm.bind(this)}>
+         {/* <div className='form-group'>
+           <label htmlFor='name'>Name</label>
+           <input
+            id='name'
+            type='text'
+            name='name'
+            required
+          />
+        </div> */}
         <div className='form-group'>
           <label htmlFor='email'>Email Address</label>
           <input
@@ -28,6 +46,7 @@ class Login extends Component {
             type='email'
             name='email'
             required
+            onChange={(e) => this.setState({email: e.target.value})}
           />
         </div>
         <div className='form-group'>
@@ -37,6 +56,7 @@ class Login extends Component {
             type='password'
             name='password'
             required
+            onChange={(e) => this.setState({password: e.target.value})}
           />
         </div>
         <input
@@ -46,8 +66,12 @@ class Login extends Component {
         />
       </form>
     </div>
-        )
-    }
+    </div>
+  )
+}
 }
 
-export default Login;
+
+export default compose(
+  graphql(LOGIN_USER,{name: "LOGIN_USER"})
+)(Login);
