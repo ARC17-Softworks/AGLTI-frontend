@@ -1,41 +1,24 @@
-import React, { Fragment } from 'react';
-import ApolloClient from 'apollo-boost';
-import { ApolloProvider} from 'react-apollo';
-import Login from './components/auth/Login';
-import Register from './components/auth/Register';
-import HeaderBar from './components/HeaderSection';
-import Navbar from './components/Navbar';
-import ProjectInfoSection from './components/Project/ProjectInfo';
-import ProjectMembersSection from './components/ProjectMembersPage/ProjectMembers';
-import ProjectPositionsSection from './components/ProjectPositionsPage/ProjectPositions';
-import DiscussionSection from './components/DiscussionPage/Discussions';
-import Kanban from './components/Kanban';
-import {BrowserRouter as Router ,Route, Switch} from 'react-router-dom';
+import logo from './logo.svg';
 import './App.css';
-
-const client = new ApolloClient({
-  uri: 'http://localhost:5000/graphql',
-  onError: (e) => { console.log(e) },
-});
 
 function App() {
   return (
-    <ApolloProvider client={client}>
     <div className="App">
-      <Login />
-      {/* <HeaderBar />  
-      <Router>
-        <Navbar />
-          <Switch>
-            <Route exact path='/info' component={ProjectInfoSection}  />
-            <Route exact path='/member' component={ProjectMembersSection}  />
-            <Route exact path='/position' component={ProjectPositionsSection}  />
-            <Route exact path='/kanban' component={Kanban}  />
-            <Route exact path='/disccussion' component={DiscussionSection}  />
-          </Switch>
-      </Router> */}
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
     </div>
-    </ApolloProvider>
   );
 }
 
