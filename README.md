@@ -1,1 +1,1 @@
-# AGLTI-frontend
+# AGLTI frontend app
