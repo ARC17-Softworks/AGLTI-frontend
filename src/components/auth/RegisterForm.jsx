@@ -30,26 +30,16 @@ export const RegisterForm = props => {
   const [beginReg, { loading }] = useMutation(REGISTER_USER, {
     update(proxy, result) {
       console.log(result);
-      toast({
-        title: 'Email Sent',
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-        position: 'bottom-left',
+      props.setModalValues({
+        title: 'Email Sent!',
+        body:
+          'Thank you for signing up. An email has been sent to you with further signup instructions. Please also check your junk folder.',
       });
+      props.onOpen();
     },
     variables: values,
     onError(err) {
-      console.log(err.graphQLErrors[0].message);
-
       if (err.graphQLErrors[0].message === 'Argument Validation Error') {
-        console.log(
-          Object.values(
-            err.graphQLErrors[0].extensions.exception.validationErrors[0]
-              .constraints
-          )[0]
-        );
-
         toast({
           title: Object.values(
             err.graphQLErrors[0].extensions.exception.validationErrors[0]
