@@ -5,7 +5,7 @@ import { RegisterForm } from './RegisterForm';
 import { ForgotPasswordForm } from './ForgotPasswordForm';
 
 export const SignInSignUp = props => (
-  <Box minW="lg" overflow="hidden" padding="3" h="50vh">
+  <Box minW="lg" overflow="hidden" padding="3" h="70vh">
     <Tabs defaultIndex={0}>
       <TabList>
         <Tab>Register</Tab>
