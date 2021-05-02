@@ -11,7 +11,7 @@ import React, { useState } from 'react';
 import { PasswordField } from './PasswordField';
 import { useMutation } from '@apollo/client';
 import gql from 'graphql-tag';
-import { useAlertContext, ADD } from '../../context/alerts';
+import { useToast } from '@chakra-ui/react';
 // import { Formik } from 'formik';
 
 export const RegisterForm = props => {
@@ -21,7 +21,7 @@ export const RegisterForm = props => {
     password: '',
   });
 
-  const { alertDispatch } = useAlertContext();
+  const toast = useToast();
 
   const onChange = e => {
     setValues({ ...values, [e.target.name]: e.target.value });
@@ -30,9 +30,12 @@ export const RegisterForm = props => {
   const [beginReg, { loading }] = useMutation(REGISTER_USER, {
     update(proxy, result) {
       console.log(result);
-      alertDispatch({
-        type: ADD,
-        payload: { message: 'email sent', status: 'success' },
+      toast({
+        title: 'Email Sent',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+        position: 'bottom-left',
       });
     },
     variables: values,
@@ -47,23 +50,23 @@ export const RegisterForm = props => {
           )[0]
         );
 
-        alertDispatch({
-          type: ADD,
-          payload: {
-            message: Object.values(
-              err.graphQLErrors[0].extensions.exception.validationErrors[0]
-                .constraints
-            )[0],
-            status: 'error',
-          },
+        toast({
+          title: Object.values(
+            err.graphQLErrors[0].extensions.exception.validationErrors[0]
+              .constraints
+          )[0],
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+          position: 'bottom-left',
         });
       } else {
-        alertDispatch({
-          type: ADD,
-          payload: {
-            message: err.graphQLErrors[0].message,
-            status: 'error',
-          },
+        toast({
+          title: err.graphQLErrors[0].message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+          position: 'bottom-left',
         });
       }
     },
