@@ -46,7 +46,7 @@ export const RegisterForm = props => {
               .constraints
           )[0],
           status: 'error',
-          duration: 5000,
+          duration: 3000,
           isClosable: true,
           position: 'bottom-left',
         });
@@ -54,7 +54,7 @@ export const RegisterForm = props => {
         toast({
           title: err.graphQLErrors[0].message,
           status: 'error',
-          duration: 5000,
+          duration: 3000,
           isClosable: true,
           position: 'bottom-left',
         });
