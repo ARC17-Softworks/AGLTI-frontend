@@ -57,10 +57,13 @@ export const SignInSignUp = props => {
             <RegisterForm setModalValues={setModalValues} onOpen={onOpen} />
           </TabPanel>
           <TabPanel>
-            <LoginForm setModalValues={setModalValues} />
+            <LoginForm setModalValues={setModalValues} onOpen={onOpen} />
           </TabPanel>
           <TabPanel>
-            <ForgotPasswordForm setModalValues={setModalValues} />
+            <ForgotPasswordForm
+              setModalValues={setModalValues}
+              onOpen={onOpen}
+            />
           </TabPanel>
         </TabPanels>
       </Tabs>
