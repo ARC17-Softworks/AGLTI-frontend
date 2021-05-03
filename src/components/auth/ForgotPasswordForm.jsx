@@ -32,25 +32,29 @@ export const ForgotPasswordForm = props => {
     },
     variables: { email },
     onError(err) {
-      if (err.graphQLErrors[0].message === 'Argument Validation Error') {
-        toast({
-          title: Object.values(
-            err.graphQLErrors[0].extensions.exception.validationErrors[0]
-              .constraints
-          )[0],
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-          position: 'bottom-left',
-        });
-      } else {
-        toast({
-          title: err.graphQLErrors[0].message,
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-          position: 'bottom-left',
-        });
+      console.log(err);
+      if (err.graphQLErrors) {
+        console.log(err.graphQLErrors);
+        if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+          toast({
+            title: Object.values(
+              err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                .constraints
+            )[0],
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        } else {
+          toast({
+            title: err.graphQLErrors[0].message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
       }
     },
   });
