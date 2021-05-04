@@ -1,44 +1,60 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
+import PropTypes from 'prop-types';
 import {flowRight as compose} from 'lodash';
 import {LOGIN_USER} from '../../queries/queries';
 import { graphql } from 'react-apollo';  // for binding
 import './style.css';
 
-class Login extends Component {
-  constructor(props){
-    super(props);
-    this.state = {
-        email:'',
-        password:''
-    }
-  }
+async function loginUser(credentials) {
+  return fetch('http://localhost:8080/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(credentials)
+  })
+    .then(data => data.json())
+ }
 
-  submitForm(e){
+// class Login extends Component {
+//   constructor(props){
+//     super(props);
+//     this.state = {
+//         email:'',
+//         password:''
+//     }
+//   }
+
+//   submitForm(e){
+//     e.preventDefault();
+//     // this.props.LOGIN_USER({
+//     //     variables: {
+//     //         email:this.state.email,
+//     //         password:this.state.password
+//     //     }
+//     // })
+//     console.log(e.target.value);
+//   }
+
+//   render(){
+export default function Login({ setToken }) {
+    const [useremail, setEmail] = useState();
+  const [password, setPassword] = useState();
+
+  const handleSubmit = async e => {
     e.preventDefault();
-    this.props.LOGIN_USER({
-        variables: {
-            email:this.state.email,
-            password:this.state.password
-        }
-    })
-    console.log(e.target.value);
+    const token = await loginUser({
+      useremail,
+      password
+    });
+    setToken(token);
   }
-
-  render(){
   return(
-     <div>
-       <h1>Account <span className='text-primary'>Login</span> </h1>
+     <div className="login-wrapper">
+       
        <div className='form-container'>
-       <form onSubmit={this.submitForm.bind(this)}>
-         {/* <div className='form-group'>
-           <label htmlFor='name'>Name</label>
-           <input
-            id='name'
-            type='text'
-            name='name'
-            required
-          />
-        </div> */}
+       <h1>Account <span className='text-primary'>Login</span> </h1>
+       <form onSubmit={handleSubmit}>
         <div className='form-group'>
           <label htmlFor='email'>Email Address</label>
           <input
@@ -46,7 +62,7 @@ class Login extends Component {
             type='email'
             name='email'
             required
-            onChange={(e) => this.setState({email: e.target.value})}
+            onChange={e => setEmail(e.target.value)}
           />
         </div>
         <div className='form-group'>
@@ -56,7 +72,7 @@ class Login extends Component {
             type='password'
             name='password'
             required
-            onChange={(e) => this.setState({password: e.target.value})}
+            onChange={e => setPassword(e.target.value)}
           />
         </div>
         <input
@@ -69,9 +85,11 @@ class Login extends Component {
     </div>
   )
 }
+
+Login.propTypes = {
+  setToken: PropTypes.func.isRequired
 }
 
-
-export default compose(
-  graphql(LOGIN_USER,{name: "LOGIN_USER"})
-)(Login);
+// export default compose(
+//   graphql(LOGIN_USER,{name: "LOGIN_USER"})
+// )(Login);

@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider} from 'react-apollo';
 import Login from './components/auth/Login';
@@ -11,6 +11,7 @@ import ProjectPositionsSection from './components/ProjectPositionsPage/ProjectPo
 import DiscussionSection from './components/DiscussionPage/Discussions';
 import Kanban from './components/Kanban';
 import {BrowserRouter as Router ,Route, Switch} from 'react-router-dom';
+import useToken from './useToken';
 import './App.css';
 
 const client = new ApolloClient({
@@ -19,10 +20,16 @@ const client = new ApolloClient({
 });
 
 function App() {
+  const { token, setToken } = useToken();
+
+  if(!token) {
+    return <Login setToken={setToken} />
+  }
+
   return (
     <ApolloProvider client={client}>
-    <div className="App">
-      <Login />
+    <div className="wrapper">
+      
       {/* <HeaderBar />  
       <Router>
         <Navbar />
