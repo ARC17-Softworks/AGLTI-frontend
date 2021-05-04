@@ -32,9 +32,7 @@ export const ForgotPasswordForm = props => {
     },
     variables: { email },
     onError(err) {
-      console.log(err);
       if (err.graphQLErrors) {
-        console.log(err.graphQLErrors);
         if (err.graphQLErrors[0].message === 'Argument Validation Error') {
           toast({
             title: Object.values(
