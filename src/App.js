@@ -20,17 +20,17 @@ const client = new ApolloClient({
 });
 
 function App() {
-  const { token, setToken } = useToken();
+  // const { token, setToken } = useToken();
 
-  if(!token) {
-    return <Login setToken={setToken} />
-  }
+  // if(!token) {
+  //   return <Login setToken={setToken} />
+  // }
 
   return (
     <ApolloProvider client={client}>
-    <div className="wrapper">
+    <div className="App">
       
-      {/* <HeaderBar />  
+      <HeaderBar />  
       <Router>
         <Navbar />
           <Switch>
@@ -40,7 +40,7 @@ function App() {
             <Route exact path='/kanban' component={Kanban}  />
             <Route exact path='/disccussion' component={DiscussionSection}  />
           </Switch>
-      </Router> */}
+      </Router>
     </div>
     </ApolloProvider>
   );
