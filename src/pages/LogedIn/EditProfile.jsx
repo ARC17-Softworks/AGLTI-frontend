@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useToast } from '@chakra-ui/react';
-import MultiSelect from '../components/form/MultiSelect';
-import { skillsList } from '../data/skillsList';
+import MultiSelect from '../../components/form/MultiSelect';
+import { skillsList } from '../../data/skillsList';
 
 const EditProfile = () => {
   const [values, setValues] = useState({

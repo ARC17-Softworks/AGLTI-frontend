@@ -23,7 +23,6 @@ export const ForgotPasswordForm = props => {
 
   const [forgotPword, { loading }] = useMutation(FORGOT_PASSWORD, {
     update(proxy, result) {
-      console.log(result);
       props.setModalValues({
         title: 'Email Sent!',
         body: 'An Email with instructions to reset password has been sent.',

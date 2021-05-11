@@ -42,7 +42,7 @@ export const Register = props => {
     <Box px={10} py={3}>
       <SignedOutNav />
       <Center maxWidth="container.xl" h="50vh" margin="auto" pt={16} px={40}>
-        <Stack spacing="12" align="center" justify="center">
+        <Stack spacing="6" align="center" justify="center">
           <Logo width="80%" fill="currentColor" />
           {loading && <Spinner size="xl" />}
           {data && <Heading>Account created successfully!</Heading>}
