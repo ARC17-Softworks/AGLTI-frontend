@@ -10,6 +10,7 @@ import {
 
 const httpLink = createHttpLink({
   uri: process.env.REACT_APP_API_URL,
+  credentials: 'include',
 });
 
 const client = new ApolloClient({

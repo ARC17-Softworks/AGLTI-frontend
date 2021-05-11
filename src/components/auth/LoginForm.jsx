@@ -30,6 +30,37 @@ export const LoginForm = props => {
 
   const toast = useToast();
 
+  const [loginUser, { loading }] = useMutation(LOGIN_USER, {
+    update(proxy, result) {
+      console.log(result);
+    },
+    variables: values,
+    onError(err) {
+      if (err.graphQLErrors) {
+        if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+          toast({
+            title: Object.values(
+              err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                .constraints
+            )[0],
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        } else {
+          toast({
+            title: err.graphQLErrors[0].message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      }
+    },
+  });
+
   const onSubmit = async e => {
     e.preventDefault();
     if (!validEmail) {
@@ -76,6 +107,8 @@ export const LoginForm = props => {
           }
         }
       }
+    } else {
+      loginUser();
     }
   };
 
@@ -137,7 +170,7 @@ export const LoginForm = props => {
           colorScheme="green"
           size="lg"
           fontSize="md"
-          isLoading={load}
+          isLoading={load || loading}
           loadingText="Submitting"
           spinnerPlacement="end"
         >
@@ -151,5 +184,17 @@ export const LoginForm = props => {
 const AUTH_EMAIL = gql`
   query authenticateEmail($email: String!) {
     authenticateEmail(email: $email)
+  }
+`;
+
+const LOGIN_USER = gql`
+  mutation login($email: String!, $password: String!) {
+    login(input: { email: $email, password: $password }) {
+      user {
+        id
+        name
+        avatar
+      }
+    }
   }
 `;

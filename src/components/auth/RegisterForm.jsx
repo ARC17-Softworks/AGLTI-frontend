@@ -12,7 +12,6 @@ import { PasswordField } from './PasswordField';
 import { useMutation } from '@apollo/client';
 import gql from 'graphql-tag';
 import { useToast } from '@chakra-ui/react';
-// import { Formik } from 'formik';
 
 export const RegisterForm = props => {
   const [values, setValues] = useState({

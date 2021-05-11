@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Box, Flex, Spacer, Center } from '@chakra-ui/react';
-import { SignInSignUp } from '../auth/SignInSignUp';
-import { SignedOutNav } from '../layout/SignedOutNav';
-import { ReactComponent as Logo } from '../../logo.svg';
+import { SignInSignUp } from '../components/auth/SignInSignUp';
+import { SignedOutNav } from '../components/layout/SignedOutNav';
+import { ReactComponent as Logo } from '../logo.svg';
 
 export const Landing = props => (
   <Box px={10} py={3}>
