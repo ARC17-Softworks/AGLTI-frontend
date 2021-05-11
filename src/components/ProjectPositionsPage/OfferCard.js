@@ -8,7 +8,7 @@ function OfferCard(props) {
                         <Avatar size="xl" mt="6px" ml="45px"/>
                         <Box bg="#4A5568" w="180px" h="25vh" color="white" mt="-30%" roundedTop="lg">
                             <Stack spacing={-5} mt="auto" spacing={0}>
-                                <Text mt="50px" textAlign="center">Bilal Rizwan</Text>
+                                <Text mt="50px" textAlign="center">{props.offer.name}</Text>
                                 <Divider mt="3px" w="150px" ml="10%"/>
                                 <Heading textAlign="center" mt="5px" as="h6" size="s">
                                     {props.offer.title}

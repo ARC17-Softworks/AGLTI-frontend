@@ -12,15 +12,7 @@ function ProjectInfoSection() {
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. ",
           imageURL: "https://bit.ly/broken-link",
           date: "5/5/2021"
-        },
-        {
-            id: 2,
-            name: "Anas Zafar",
-            description:
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. ",
-            imageURL: "https://bit.ly/broken-link",
-            date: "5/5/2021"
-          }
+        }
       ];
     
     const [projects, setProjects] = useState([]);
@@ -32,7 +24,7 @@ function ProjectInfoSection() {
       console.log(projects);
         return (
             <Box zIndex={-1} position= "absolute" bg="#171923" h="100vh" color="white" w="100%">
-                {projects.slice(0,1).map((project, id) => {
+                {projects.map((project, id) => {
                     return(
                 <Fade in={!isOpen}>
                     <Box h="80vh" w="80%" ml="8%" mt="6%" borderRadius="lg" bg="#2D3748" alignContent="center" key={id} >

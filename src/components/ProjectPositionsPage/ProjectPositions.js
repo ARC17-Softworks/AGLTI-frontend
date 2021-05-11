@@ -38,6 +38,14 @@ function ProjectPositionsSection() {
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. ",
             skills : ["Javascript", "Reactjs", "CSS"]
         },
+        {
+            id: 4,
+            name: "Bilal Zubairi",
+            title: "Title of Discussion",
+            description:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. ",
+            skills : ["Javascript", "HTML", "CSS"]
+        },
       ]);
 
     const [offerList,setOfferList] = useState([
@@ -59,6 +67,49 @@ function ProjectPositionsSection() {
           },
           {
             id: 3,
+            name: "Anas Zafar",
+            title: "Title of Discussion",
+            description:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. ",
+            skills : ["Javascript", "Reactjs", "CSS"]
+        },
+        {
+            id: 4,
+            name: "Anas Zafar",
+            title: "Title of Discussion",
+            description:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. ",
+            skills : ["Javascript", "Reactjs", "CSS"]
+        },
+    ]);
+
+    const [applicantList,setApplicantList] = useState([
+        {
+            id: 1,
+            name: "Bilal Rizwan",
+            title: "Title of Position",
+            description:
+              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. ",
+            skills : ["Javascript", "Reactjs", "CSS"]
+          },
+          {
+              id: 2,
+              name: "Bilal Zubairi",
+              title: "Title of Discussion",
+              description:
+              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. ",
+              skills : ["Javascript", "Reactjs", "CSS"]
+          },
+          {
+            id: 3,
+            name: "Anas Zafar",
+            title: "Title of Discussion",
+            description:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. ",
+            skills : ["Javascript", "Reactjs", "CSS"]
+        },
+        {
+            id: 4,
             name: "Anas Zafar",
             title: "Title of Discussion",
             description:
@@ -89,6 +140,8 @@ function ProjectPositionsSection() {
 
     useEffect(() => {
         setOfferList(offerList);
+        setApplicantList(applicantList);
+        
       },[]);
 
     return (
@@ -177,7 +230,7 @@ function ProjectPositionsSection() {
                     <Icon name="chevron-left" size="80px" mt="80px" ml="10px"/>
                     {offerList.map((offer, id) => {
                     return(
-                    <Grid templateColumns="repeat(4, 1fr)" gap={0} ml="5px" mr="8%" mt="1%">
+                    <Grid templateColumns="repeat(4, 1fr)" gap={4} ml="5px" mr="8%" mt="1%">
                         <OfferCard key={id} offer={offer}/>
                     </Grid>
                     );
@@ -192,13 +245,15 @@ function ProjectPositionsSection() {
                 <Heading textAlign="left" size="xl" ml="8%">Applicants</Heading>
                 <Stack isInline spacing="auto" ml="10px" mr="40px" >
                     <Icon name="chevron-left" size="80px" mt="80px" ml="10px"/>
-                    <Grid templateColumns="repeat(4, 1fr)" gap={6} ml="-120px" mr="8%" mt="1%">
-                        <ApplicantCard />
-                        <ApplicantCard />
-                        <ApplicantCard />
-                        <ApplicantCard />
+                    {applicantList.map((applicant, id) => {
+                    return(
+                    <Grid templateColumns="repeat(4, 1fr)" gap={3}  mr="5px" mt="1%">
+                        <ApplicantCard key={id} applicant={applicant}/>
                     </Grid>
-                    <Icon name="chevron-right" size="80px" ml="90px" mt="80px" mr="20px"/>
+                        );
+                    })
+                    }
+                    <Icon name="chevron-right" size="80px" ml="10px" mt="80px" mr="20px"/>
                 </Stack>
             </Box>
             </SimpleGrid>
