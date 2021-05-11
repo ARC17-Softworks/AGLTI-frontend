@@ -15,7 +15,7 @@ function PositionCard(props) {
                                 </Text>
                                 {skillArr.map((skill) => {
                                 return(
-                                    <Tag size="xs" bg="#718096" ml="3px" mr="3px" borderRadius="lg" color="white">{skill}</Tag>
+                                    <Tag isInline size="xs" bg="#718096" ml="3px" mr="3px" borderRadius="lg" color="white">{skill}</Tag>
                                 );
                             }
                             )}

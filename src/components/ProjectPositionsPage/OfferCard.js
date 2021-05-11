@@ -1,31 +1,36 @@
 import React, { Component } from 'react';
 import { Box, Grid, SimpleGrid, Stack, Heading, Icon, Text, Button, Tag, CloseButton, Badge, Avatar, AvatarBadge, Divider } from "@chakra-ui/core";
 
-class OfferCard extends Component {
-    render() {
+function OfferCard(props) {
+    let skillArr = props.offer.skills;
         return (
-            <Stack direction="column" ml="8%" mr="23%" spacing={4}>
-                        <Avatar size="xl" mt="3%" ml="30%"/>
-                        <Box bg="#4A5568" w="120%" h="28vh" color="white" mt="-40%" borderRadius="lg">
-                            <Stack>
-                                <Text mt="25%" textAlign="center">Bilal Rizwan</Text>
-                                <Divider mt="1%" w="80%" ml="10%"/>
-                                <Heading textAlign="center" mt="auto" as="h6" size="s">
-                                    Position Title
+            <Stack direction="column" ml="8%" mr="23%" spacing={0}>
+                        <Avatar size="xl" mt="6px" ml="45px"/>
+                        <Box bg="#4A5568" w="180px" h="25vh" color="white" mt="-30%" roundedTop="lg">
+                            <Stack spacing={-5} mt="auto" spacing={0}>
+                                <Text mt="50px" textAlign="center">Bilal Rizwan</Text>
+                                <Divider mt="3px" w="150px" ml="10%"/>
+                                <Heading textAlign="center" mt="5px" as="h6" size="s">
+                                    {props.offer.title}
                                 </Heading>
-                                <Stack isInline spacing={2} ml="10px" mr="10%" mt="2%" >
-                                    <Tag size="xs" bg="#718096" borderRadius="lg" color="white">HTML</Tag>
-                                    <Tag size="xs" bg="#718096" borderRadius="lg" color="white">CSS</Tag>
-                                    <Tag size="xs" bg="#718096" borderRadius="lg" color="white">Javascript</Tag>
+                                <Stack direction="row" spacing={2} ml="3px" mr="3px" mt="2%" >
+                                {skillArr.map((skill) => {
+                                return(
+                                    
+                                    <Tag size="xs" bg="#718096" borderRadius="lg" color="white" display="row">{skill}</Tag>
+                                    
+                                
+                                );
+                                }
+                                )}
                                 </Stack>
-                                <Button w="100%" h="5vh" bg="#E53E3E" align="end" roundedTop="0" roundedBottom="lg" variant="solid">
-                                    cancel offer
-                                </Button>
                             </Stack>
                         </Box>
+                        <Button w="180px" h="5vh" bg="#E53E3E" align="end" roundedTop="0" roundedBottom="lg" variant="solid">
+                                    cancel offer
+                            </Button>
                     </Stack>
         )
-    }
 }
 
 export default OfferCard;
