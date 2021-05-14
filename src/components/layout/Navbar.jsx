@@ -2,7 +2,7 @@ import { chakra, Flex, Box, Spacer } from '@chakra-ui/react';
 import * as React from 'react';
 import { ColorModeSwitcher } from '../../ColorModeSwitcher';
 
-export const SignedOutNav = () => (
+export const Navbar = () => (
   <chakra.header w="full" pb={10}>
     <Flex>
       <Box></Box>

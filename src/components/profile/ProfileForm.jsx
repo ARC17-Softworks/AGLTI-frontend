@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useToast } from '@chakra-ui/react';
-import MultiSelect from '../../components/form/MultiSelect';
+import MultiSelect from '../form/MultiSelect';
 import { skillsList } from '../../data/skillsList';
 
-const EditProfile = () => {
+const CreateProfile = () => {
   const [values, setValues] = useState({
     skills: [],
     localtion: '',
@@ -74,4 +74,4 @@ const EditProfile = () => {
   );
 };
 
-export default EditProfile;
+export default CreateProfile;

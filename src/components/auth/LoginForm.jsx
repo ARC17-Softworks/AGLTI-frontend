@@ -11,13 +11,17 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import { CloseIcon } from '@chakra-ui/icons';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { PasswordField } from './PasswordField';
 import { useMutation, useApolloClient } from '@apollo/client';
 import gql from 'graphql-tag';
 import { useToast } from '@chakra-ui/react';
 
+import { AuthContext } from '../../context/auth';
+
 export const LoginForm = props => {
+  const context = useContext(AuthContext);
+
   const [values, setValues] = useState({
     email: '',
     password: '',
@@ -32,7 +36,11 @@ export const LoginForm = props => {
 
   const [loginUser, { loading }] = useMutation(LOGIN_USER, {
     update(proxy, result) {
-      console.log(result);
+      context.login({
+        id: result.data.login.user.id,
+        name: result.data.login.user.name,
+        avatar: result.data.login.user.avatar,
+      });
     },
     variables: values,
     onError(err) {

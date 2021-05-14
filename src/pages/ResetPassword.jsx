@@ -1,24 +1,30 @@
 import { Button, chakra, Box, Center, Heading, Stack } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import queryString from 'query-string';
 import { useMutation, gql } from '@apollo/client';
-import { SignedOutNav } from '../components/layout/SignedOutNav';
 import { PasswordField } from '../components/auth/PasswordField';
 import { useToast } from '@chakra-ui/react';
+import { useLocation } from 'react-router-dom';
+import { AuthContext } from '../context/auth';
 
 export const ResetPassword = props => {
+  const context = useContext(AuthContext);
   const [values, setValues] = useState({
     password: '',
     confirmPassword: '',
   });
 
-  const parsed = queryString.parse(props.location.search);
+  const parsed = queryString.parse(useLocation().search);
 
   const toast = useToast();
 
   const [resetPword, { loading }] = useMutation(RESET_PASSWORD, {
     update(proxy, result) {
-      console.log(result);
+      context.login({
+        id: result.data.login.user.id,
+        name: result.data.login.user.name,
+        avatar: result.data.login.user.avatar,
+      });
       toast({
         title: 'password reset',
         status: 'success',
@@ -92,7 +98,6 @@ export const ResetPassword = props => {
 
   return (
     <Box px={10} py={3}>
-      <SignedOutNav />
       <Center maxWidth="container.xl" h="50vh" margin="auto" pt={16} px={40}>
         <chakra.form onSubmit={onSubmit} {...props}>
           <Stack spacing="6">
