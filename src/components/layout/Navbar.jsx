@@ -13,7 +13,7 @@ export const Navbar = props => {
   }
 
   return (
-    <chakra.header w="full" pb={10}>
+    <chakra.header w="full" px={4} py={4} shadow="md">
       <Flex>
         <Box></Box>
         <Spacer />

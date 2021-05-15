@@ -13,8 +13,7 @@ import {
 import { CloseIcon } from '@chakra-ui/icons';
 import React, { useState, useContext } from 'react';
 import { PasswordField } from './PasswordField';
-import { useMutation, useApolloClient } from '@apollo/client';
-import gql from 'graphql-tag';
+import { useMutation, useApolloClient, gql } from '@apollo/client';
 import { useToast } from '@chakra-ui/react';
 
 import { AuthContext } from '../../context/auth';

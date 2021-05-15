@@ -1,83 +1,68 @@
 import React, { useContext } from 'react';
 import {
   chakra,
-  Box,
   Flex,
   useColorModeValue,
-  VisuallyHidden,
   HStack,
   Button,
-  useDisclosure,
-  VStack,
   IconButton,
-  CloseButton,
   Avatar,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuGroup,
+  MenuItem,
+  MenuDivider,
 } from '@chakra-ui/react';
 import { House } from 'phosphor-react';
-import { BellIcon, HamburgerIcon } from '@chakra-ui/icons';
 import { AuthContext } from '../../context/auth';
 import { ColorModeSwitcher } from '../../ColorModeSwitcher';
 import { ReactComponent as Logo } from '../../navlogo.svg';
+import { useMutation, gql } from '@apollo/client';
 
 export const SignedInNav = () => {
   const context = useContext(AuthContext);
   const bg = useColorModeValue('white', 'gray.800');
-  const mobileNav = useDisclosure();
+
+  const [loginUser, { loading }] = useMutation(LOGIN_USER, {
+    update() {
+      context.logout();
+    },
+    variables: values,
+    onError(err) {
+      if (err.graphQLErrors) {
+        if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+          toast({
+            title: Object.values(
+              err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                .constraints
+            )[0],
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        } else {
+          toast({
+            title: err.graphQLErrors[0].message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      }
+    },
+  });
 
   return (
     <React.Fragment>
-      <chakra.header
-        bg={bg}
-        w="full"
-        px={{ base: 2, sm: 4 }}
-        py={4}
-        shadow="md"
-      >
+      <chakra.header bg={bg} w="full" px={4} py={4} shadow="md">
         <Flex alignItems="center" justifyContent="space-between" mx="auto">
           <HStack display="flex" spacing={3} alignItems="center">
-            <Box display={{ base: 'inline-flex', md: 'none' }}>
-              <IconButton
-                display={{ base: 'flex', md: 'none' }}
-                aria-label="Open menu"
-                fontSize="20px"
-                color={useColorModeValue('gray.800', 'inherit')}
-                variant="ghost"
-                icon={<HamburgerIcon />}
-                onClick={mobileNav.onOpen}
-              />
-              <VStack
-                pos="absolute"
-                top={0}
-                left={0}
-                right={0}
-                display={mobileNav.isOpen ? 'flex' : 'none'}
-                flexDirection="column"
-                p={2}
-                pb={4}
-                m={2}
-                bg={bg}
-                spacing={3}
-                rounded="sm"
-                shadow="sm"
-              >
-                <CloseButton
-                  aria-label="Close menu"
-                  justifySelf="self-start"
-                  onClick={mobileNav.onClose}
-                />
-                <Button
-                  w="full"
-                  variant="ghost"
-                  leftIcon={<House weight="fill" />}
-                >
-                  Dashboard
-                </Button>
-              </VStack>
-            </Box>
-
             <Logo width="100px" fill="currentColor" />
 
-            <HStack spacing={3} display={{ base: 'none', md: 'inline-flex' }}>
+            <HStack spacing={3}>
               <Button
                 variant="ghost"
                 leftIcon={<House weight="fill" />}
@@ -87,23 +72,28 @@ export const SignedInNav = () => {
               </Button>
             </HStack>
           </HStack>
-          <HStack
-            spacing={3}
-            display={mobileNav.isOpen ? 'none' : 'flex'}
-            alignItems="center"
-          >
+          <HStack spacing={3} alignItems="center">
             <ColorModeSwitcher />
-            <chakra.a
-              p={3}
-              color={useColorModeValue('gray.800', 'inherit')}
-              rounded="sm"
-              _hover={{ color: useColorModeValue('gray.800', 'gray.600') }}
-            >
-              <BellIcon />
-              <VisuallyHidden>Notifications</VisuallyHidden>
-            </chakra.a>
 
-            <Avatar size="sm" src={context.user.avatar} />
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                variant="ghost"
+                isRound={true}
+                size="sm"
+              >
+                <Avatar size="sm" src={context.user.avatar} />
+              </MenuButton>
+              <MenuList>
+                <MenuGroup title={context.user.name}>
+                  <MenuItem>My Profile</MenuItem>
+                </MenuGroup>
+                <MenuDivider />
+                <MenuGroup>
+                  <MenuItem>Logout</MenuItem>
+                </MenuGroup>
+              </MenuList>
+            </Menu>
           </HStack>
         </Flex>
       </chakra.header>
