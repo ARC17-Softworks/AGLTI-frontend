@@ -1,5 +1,6 @@
 import { Box, Center, Spinner, Heading, Text, Stack } from '@chakra-ui/react';
 import React, { useState, useEffect, useContext } from 'react';
+import { Redirect } from 'react-router-dom';
 import queryString from 'query-string';
 import { useMutation, gql } from '@apollo/client';
 import { ReactComponent as Logo } from '../logo.svg';
@@ -18,9 +19,9 @@ export const Register = props => {
     {
       update(proxy, result) {
         context.login({
-          id: result.data.login.user.id,
-          name: result.data.login.user.name,
-          avatar: result.data.login.user.avatar,
+          id: result.data.completeRegistration.user.id,
+          name: result.data.completeRegistration.user.name,
+          avatar: result.data.completeRegistration.user.avatar,
         });
       },
       variables: { webtoken: parsed.token },
@@ -47,6 +48,14 @@ export const Register = props => {
   useEffect(() => {
     completeReg();
   }, [completeReg]);
+
+  if (context.user) {
+    return <Redirect to="/dashboard" />;
+  }
+
+  if (!parsed.token) {
+    return <Redirect to="/" />;
+  }
 
   return (
     <Box px={10} py={3}>

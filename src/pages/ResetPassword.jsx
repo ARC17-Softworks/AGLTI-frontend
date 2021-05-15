@@ -1,5 +1,6 @@
 import { Button, chakra, Box, Center, Heading, Stack } from '@chakra-ui/react';
 import React, { useState, useContext } from 'react';
+import { Redirect } from 'react-router-dom';
 import queryString from 'query-string';
 import { useMutation, gql } from '@apollo/client';
 import { PasswordField } from '../components/auth/PasswordField';
@@ -21,9 +22,9 @@ export const ResetPassword = props => {
   const [resetPword, { loading }] = useMutation(RESET_PASSWORD, {
     update(proxy, result) {
       context.login({
-        id: result.data.login.user.id,
-        name: result.data.login.user.name,
-        avatar: result.data.login.user.avatar,
+        id: result.data.resetPassword.user.id,
+        name: result.data.resetPassword.user.name,
+        avatar: result.data.resetPassword.user.avatar,
       });
       toast({
         title: 'password reset',
@@ -35,6 +36,7 @@ export const ResetPassword = props => {
     },
     variables: { resettoken: parsed.token, newPassword: values.password },
     onError(err) {
+      console.log(err);
       if (err.graphQLErrors) {
         console.log(err.graphQLErrors);
         if (err.graphQLErrors[0].message === 'Argument Validation Error') {
@@ -95,6 +97,14 @@ export const ResetPassword = props => {
       resetPword();
     }
   };
+
+  if (context.user) {
+    return <Redirect to="/dashboard" />;
+  }
+
+  if (!parsed.token) {
+    return <Redirect to="/" />;
+  }
 
   return (
     <Box px={10} py={3}>

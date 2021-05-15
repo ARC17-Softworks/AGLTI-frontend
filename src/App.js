@@ -7,6 +7,7 @@ import { Landing } from './pages/Landing';
 import { Register } from './pages/Register';
 import { ResetPassword } from './pages/ResetPassword';
 import { NotFound } from './pages/NotFound';
+import { Dashboard } from './pages/LogedIn/Dashboard';
 
 import { AuthProvider } from './context/auth';
 
@@ -25,6 +26,9 @@ function App() {
             </Route>
             <Route exact path="/resetpassword">
               <ResetPassword />
+            </Route>
+            <Route exact path="/dashboard">
+              <Dashboard />
             </Route>
             <Route>
               <NotFound />

@@ -7,7 +7,6 @@ import { SignedInNav } from './SignedInNav';
 
 export const Navbar = props => {
   const context = useContext(AuthContext);
-
   if (context.user) {
     return <SignedInNav />;
   }
