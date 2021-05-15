@@ -1,10 +1,11 @@
 import React, { useReducer, createContext } from 'react';
 import { useQuery, gql } from '@apollo/client';
 
-const initialState = { user: null };
+const initialState = { user: null, profile: null };
 
 const AuthContext = createContext({
   user: null,
+  profile: null,
   login: data => {},
   logout: () => {},
 });
@@ -20,6 +21,7 @@ const authReducer = (state, action) => {
       return {
         ...state,
         user: null,
+        profile: null,
       };
     default:
       return state;
@@ -32,8 +34,8 @@ const AuthProvider = props => {
     skip: isPopulated,
     fetchPolicy: 'network-only',
   });
-  if (!isPopulated) {
-    if (data.checkAuth.user.id) {
+  if (!isPopulated && data) {
+    if (data.checkAuth.user) {
       initialState.user = {
         id: data.checkAuth.user.id,
         name: data.checkAuth.user.name,
@@ -41,7 +43,6 @@ const AuthProvider = props => {
       };
     }
   }
-  console.log(initialState);
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   const login = data => {
