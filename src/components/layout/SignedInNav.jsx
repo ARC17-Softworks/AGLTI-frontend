@@ -16,6 +16,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { House } from 'phosphor-react';
+import { Redirect } from 'react-router-dom';
 import { AuthContext } from '../../context/auth';
 import { ColorModeSwitcher } from '../../ColorModeSwitcher';
 import { ReactComponent as Logo } from '../../navlogo.svg';
@@ -68,6 +69,7 @@ export const SignedInNav = () => {
                 variant="ghost"
                 leftIcon={<House weight="fill" />}
                 size="sm"
+                onClick={() => <Redirect to="/dashboard" />}
               >
                 Dashboard
               </Button>
