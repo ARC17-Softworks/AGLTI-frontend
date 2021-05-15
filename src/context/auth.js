@@ -17,6 +17,11 @@ const authReducer = (state, action) => {
         ...state,
         user: action.payload,
       };
+    case 'SET_PROFILE':
+      return {
+        ...state,
+        profile: action.payload,
+      };
     case 'LOGOUT':
       return {
         ...state,
@@ -29,12 +34,14 @@ const authReducer = (state, action) => {
 };
 
 const AuthProvider = props => {
-  const isPopulated = initialState.user !== null;
+  const userPopulated = initialState.user !== null;
+
   const { data } = useQuery(CHECK_AUTH, {
-    skip: isPopulated,
+    skip: userPopulated,
     fetchPolicy: 'network-only',
   });
-  if (!isPopulated && data) {
+
+  if (!userPopulated && data) {
     if (data.checkAuth.user) {
       initialState.user = {
         id: data.checkAuth.user.id,
@@ -43,6 +50,26 @@ const AuthProvider = props => {
       };
     }
   }
+
+  const profilePopulated =
+    initialState.profile !== null || initialState.user === null;
+
+  const { data: profileData } = useQuery(CHECK_PROFILE, {
+    skip: profilePopulated,
+    fetchPolicy: 'network-only',
+  });
+
+  if (!profilePopulated && profileData) {
+    if (profileData.checkProfile.profile) {
+      initialState.profile = {
+        skills: profileData.checkProfile.profile.skills,
+        activeProject: profileData.checkProfile.profile.activeProject
+          ? profileData.checkProfile.profile.activeProject.title
+          : profileData.checkProfile.profile.activeProject,
+      };
+    }
+  }
+
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   const login = data => {
@@ -55,7 +82,7 @@ const AuthProvider = props => {
 
   return (
     <AuthContext.Provider
-      value={{ user: state.user, login, logout }}
+      value={{ user: state.user, profile: state.profile, login, logout }}
       {...props}
     />
   );
@@ -68,6 +95,19 @@ const CHECK_AUTH = gql`
         id
         name
         avatar
+      }
+    }
+  }
+`;
+
+const CHECK_PROFILE = gql`
+  query checkProfile {
+    checkProfile {
+      profile {
+        skills
+        activeProject {
+          title
+        }
       }
     }
   }
