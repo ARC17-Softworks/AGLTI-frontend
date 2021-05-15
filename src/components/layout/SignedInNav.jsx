@@ -13,6 +13,7 @@ import {
   MenuGroup,
   MenuItem,
   MenuDivider,
+  useToast,
 } from '@chakra-ui/react';
 import { House } from 'phosphor-react';
 import { AuthContext } from '../../context/auth';
@@ -23,12 +24,12 @@ import { useMutation, gql } from '@apollo/client';
 export const SignedInNav = () => {
   const context = useContext(AuthContext);
   const bg = useColorModeValue('white', 'gray.800');
+  const toast = useToast();
 
-  const [loginUser, { loading }] = useMutation(LOGIN_USER, {
+  const [logoutUser] = useMutation(LOGOUT_USER, {
     update() {
       context.logout();
     },
-    variables: values,
     onError(err) {
       if (err.graphQLErrors) {
         if (err.graphQLErrors[0].message === 'Argument Validation Error') {
@@ -90,7 +91,7 @@ export const SignedInNav = () => {
                 </MenuGroup>
                 <MenuDivider />
                 <MenuGroup>
-                  <MenuItem>Logout</MenuItem>
+                  <MenuItem onClick={() => logoutUser()}>Logout</MenuItem>
                 </MenuGroup>
               </MenuList>
             </Menu>
@@ -100,3 +101,9 @@ export const SignedInNav = () => {
     </React.Fragment>
   );
 };
+
+const LOGOUT_USER = gql`
+  mutation logout {
+    logout
+  }
+`;
