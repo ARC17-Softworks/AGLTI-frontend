@@ -14,9 +14,10 @@ import {
   MenuItem,
   MenuDivider,
   useToast,
+  Link,
 } from '@chakra-ui/react';
 import { House } from 'phosphor-react';
-import { Redirect } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { AuthContext } from '../../context/auth';
 import { ColorModeSwitcher } from '../../ColorModeSwitcher';
 import { ReactComponent as Logo } from '../../navlogo.svg';
@@ -65,14 +66,15 @@ export const SignedInNav = () => {
             <Logo width="100px" fill="currentColor" />
 
             <HStack spacing={3}>
-              <Button
-                variant="ghost"
-                leftIcon={<House weight="fill" />}
-                size="sm"
-                onClick={() => <Redirect to="/dashboard" />}
-              >
-                Dashboard
-              </Button>
+              <Link as={RouterLink} to="/dashboard">
+                <Button
+                  variant="ghost"
+                  leftIcon={<House weight="fill" />}
+                  size="sm"
+                >
+                  Dashboard
+                </Button>
+              </Link>
             </HStack>
           </HStack>
           <HStack spacing={3} alignItems="center">
@@ -93,6 +95,7 @@ export const SignedInNav = () => {
                 </MenuGroup>
                 <MenuDivider />
                 <MenuGroup>
+                  <MenuItem>Change Password</MenuItem>
                   <MenuItem onClick={() => logoutUser()}>Logout</MenuItem>
                 </MenuGroup>
               </MenuList>

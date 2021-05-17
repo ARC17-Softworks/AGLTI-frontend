@@ -4,13 +4,12 @@ import { Redirect } from 'react-router-dom';
 import queryString from 'query-string';
 import { useMutation, gql } from '@apollo/client';
 import { ReactComponent as Logo } from '../logo.svg';
-import { useLocation } from 'react-router-dom';
 
 import { AuthContext } from '../context/auth';
 
 export const Register = props => {
   const context = useContext(AuthContext);
-  const parsed = queryString.parse(useLocation().search);
+  const parsed = queryString.parse(props.location.search);
 
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -48,10 +47,6 @@ export const Register = props => {
   useEffect(() => {
     completeReg();
   }, [completeReg]);
-
-  if (context.user) {
-    return <Redirect to="/dashboard" />;
-  }
 
   if (!parsed.token) {
     return <Redirect to="/" />;

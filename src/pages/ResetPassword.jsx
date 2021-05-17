@@ -5,7 +5,6 @@ import queryString from 'query-string';
 import { useMutation, gql } from '@apollo/client';
 import { PasswordField } from '../components/auth/PasswordField';
 import { useToast } from '@chakra-ui/react';
-import { useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/auth';
 
 export const ResetPassword = props => {
@@ -15,7 +14,7 @@ export const ResetPassword = props => {
     confirmPassword: '',
   });
 
-  const parsed = queryString.parse(useLocation().search);
+  const parsed = queryString.parse(props.location.search);
 
   const toast = useToast();
 
@@ -97,10 +96,6 @@ export const ResetPassword = props => {
       resetPword();
     }
   };
-
-  if (context.user) {
-    return <Redirect to="/dashboard" />;
-  }
 
   if (!parsed.token) {
     return <Redirect to="/" />;

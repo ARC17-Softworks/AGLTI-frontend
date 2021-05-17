@@ -13,6 +13,8 @@ export const skillsList = [
   { value: 'Angular', label: 'Angular' },
   { value: 'Vue', label: 'Vue' },
   { value: 'Javascript', label: 'Javascript' },
+  { value: 'Typescript', label: 'Typescript' },
+  { value: 'GraphQL', label: 'GraphQL' },
   { value: 'HTML-CSS', label: 'HTML/CSS' },
   { value: 'Sass', label: 'Sass' },
   { value: 'MongoDB', label: 'MongoDB' },
@@ -37,7 +39,7 @@ export const skillsList = [
   { value: 'Deep-Learning', label: 'Deep Learning' },
   {
     value: 'NLP',
-    label: 'Natural Language Processing (NLP)',
+    label: 'Natural Language Processing',
   },
   { value: 'DevOps', label: 'DevOps' },
   { value: 'AWS', label: 'AWS' },

@@ -1,18 +1,9 @@
-import React, { useContext } from 'react';
-import { Redirect } from 'react-router-dom';
+import React from 'react';
 import { Box, Flex, Spacer, Center } from '@chakra-ui/react';
 import { SignInSignUp } from '../components/auth/SignInSignUp';
 import { ReactComponent as Logo } from '../logo.svg';
 
-import { AuthContext } from '../context/auth';
-
 export const Landing = props => {
-  const context = useContext(AuthContext);
-
-  if (context.user) {
-    return <Redirect to="/dashboard" />;
-  }
-
   return (
     <Box px={10} py={3}>
       <Flex>

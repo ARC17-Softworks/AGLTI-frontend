@@ -7,6 +7,7 @@ const AuthContext = createContext({
   user: null,
   profile: null,
   login: data => {},
+  setProfile: data => {},
   logout: () => {},
 });
 
@@ -76,13 +77,23 @@ const AuthProvider = props => {
     dispatch({ type: 'LOGIN', payload: data });
   };
 
+  const setProfile = data => {
+    dispatch({ type: 'SET_PROFILE', payload: data });
+  };
+
   const logout = data => {
     dispatch({ type: 'LOGOUT' });
   };
 
   return (
     <AuthContext.Provider
-      value={{ user: state.user, profile: state.profile, login, logout }}
+      value={{
+        user: state.user,
+        profile: state.profile,
+        login,
+        setProfile,
+        logout,
+      }}
       {...props}
     />
   );

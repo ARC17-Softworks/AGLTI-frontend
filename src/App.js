@@ -2,6 +2,7 @@ import React from 'react';
 import { ChakraProvider } from '@chakra-ui/react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import theme from './theme';
+import { UnAuthenticatedRoute, AuthenticatedRoute } from './utils/Routes';
 import { Navbar } from './components/layout/Navbar';
 import { Landing } from './pages/Landing';
 import { Register } from './pages/Register';
@@ -10,6 +11,7 @@ import { NotFound } from './pages/NotFound';
 import { Dashboard } from './pages/LogedIn/Dashboard';
 
 import { AuthProvider } from './context/auth';
+import { CreateProfile } from './pages/LogedIn/CreateProfile';
 
 function App() {
   return (
@@ -18,18 +20,19 @@ function App() {
         <Router>
           <Navbar />
           <Switch>
-            <Route exact path="/">
-              <Landing />
-            </Route>
-            <Route exact path="/register">
-              <Register />
-            </Route>
-            <Route exact path="/resetpassword">
-              <ResetPassword />
-            </Route>
-            <Route exact path="/dashboard">
-              <Dashboard />
-            </Route>
+            <UnAuthenticatedRoute exact path="/" component={Landing} />
+            <UnAuthenticatedRoute exact path="/register" component={Register} />
+            <UnAuthenticatedRoute
+              exact
+              path="/resetpassword"
+              component={ResetPassword}
+            />
+            <AuthenticatedRoute exact path="/dashboard" component={Dashboard} />
+            <AuthenticatedRoute
+              exact
+              path="/createprofile"
+              component={CreateProfile}
+            />
             <Route>
               <NotFound />
             </Route>

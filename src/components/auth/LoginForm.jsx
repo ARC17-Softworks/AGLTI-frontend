@@ -78,7 +78,6 @@ export const LoginForm = props => {
           variables: { email: values.email },
         });
         setload(false);
-        console.log(data);
         if (data.authenticateEmail) {
           setValidEmail(true);
         } else {

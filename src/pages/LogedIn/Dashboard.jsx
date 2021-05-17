@@ -5,8 +5,8 @@ import { AuthContext } from '../../context/auth';
 export const Dashboard = () => {
   const context = useContext(AuthContext);
 
-  if (!context.user) {
-    return <Redirect to="/" />;
+  if (!context.profile) {
+    return <Redirect to="/createprofile" />;
   }
 
   return <div>Dashboard</div>;
