@@ -12,6 +12,7 @@ import { Dashboard } from './pages/LogedIn/Dashboard';
 
 import { AuthProvider } from './context/auth';
 import { CreateProfile } from './pages/LogedIn/CreateProfile';
+import { ChangePassword } from './pages/LogedIn/ChangePassword';
 
 function App() {
   return (
@@ -32,6 +33,11 @@ function App() {
               exact
               path="/createprofile"
               component={CreateProfile}
+            />
+            <AuthenticatedRoute
+              exact
+              path="/user/changepassword"
+              component={ChangePassword}
             />
             <Route>
               <NotFound />

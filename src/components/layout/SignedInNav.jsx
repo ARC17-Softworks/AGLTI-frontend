@@ -95,7 +95,15 @@ export const SignedInNav = () => {
                 </MenuGroup>
                 <MenuDivider />
                 <MenuGroup>
-                  <MenuItem>Change Password</MenuItem>
+                  <MenuItem>
+                    <Link
+                      as={RouterLink}
+                      to="/user/changepassword"
+                      style={{ textDecoration: 'none' }}
+                    >
+                      Change Password
+                    </Link>
+                  </MenuItem>
                   <MenuItem onClick={() => logoutUser()}>Logout</MenuItem>
                 </MenuGroup>
               </MenuList>
