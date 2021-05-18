@@ -9,15 +9,18 @@ import {
   InputGroup,
   InputRightElement,
   IconButton,
+  useToast,
 } from '@chakra-ui/react';
 import { CloseIcon } from '@chakra-ui/icons';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { PasswordField } from './PasswordField';
-import { useMutation, useApolloClient } from '@apollo/client';
-import gql from 'graphql-tag';
-import { useToast } from '@chakra-ui/react';
+import { useMutation, useApolloClient, gql } from '@apollo/client';
+
+import { AuthContext } from '../../context/auth';
 
 export const LoginForm = props => {
+  const context = useContext(AuthContext);
+
   const [values, setValues] = useState({
     email: '',
     password: '',
@@ -30,6 +33,59 @@ export const LoginForm = props => {
 
   const toast = useToast();
 
+  const [loginUser, { loading }] = useMutation(LOGIN_USER, {
+    update(proxy, result) {
+      context.login({
+        user: {
+          id: result.data.login.user.id,
+          name: result.data.login.user.name,
+          avatar: result.data.login.user.avatar,
+        },
+        profile: result.data.login.profile
+          ? {
+              skills: result.data.login.profile.skills,
+              activeProject: result.data.login.profile.activeProject
+                ? result.data.login.profile.activeProject.title
+                : result.data.login.profile.activeProject,
+            }
+          : null,
+      });
+    },
+    variables: values,
+    onError(err) {
+      if (err.graphQLErrors[0]) {
+        if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+          toast({
+            title: Object.values(
+              err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                .constraints
+            )[0],
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        } else {
+          toast({
+            title: err.graphQLErrors[0].message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      } else {
+        toast({
+          title: err.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'bottom-left',
+        });
+      }
+    },
+  });
+
   const onSubmit = async e => {
     e.preventDefault();
     if (!validEmail) {
@@ -40,7 +96,6 @@ export const LoginForm = props => {
           variables: { email: values.email },
         });
         setload(false);
-        console.log(data);
         if (data.authenticateEmail) {
           setValidEmail(true);
         } else {
@@ -76,6 +131,8 @@ export const LoginForm = props => {
           }
         }
       }
+    } else {
+      loginUser();
     }
   };
 
@@ -137,7 +194,7 @@ export const LoginForm = props => {
           colorScheme="green"
           size="lg"
           fontSize="md"
-          isLoading={load}
+          isLoading={load || loading}
           loadingText="Submitting"
           spinnerPlacement="end"
         >
@@ -151,5 +208,24 @@ export const LoginForm = props => {
 const AUTH_EMAIL = gql`
   query authenticateEmail($email: String!) {
     authenticateEmail(email: $email)
+  }
+`;
+
+const LOGIN_USER = gql`
+  mutation login($email: String!, $password: String!) {
+    login(input: { email: $email, password: $password }) {
+      user {
+        id
+        name
+        avatar
+      }
+
+      profile {
+        skills
+        activeProject {
+          title
+        }
+      }
+    }
   }
 `;

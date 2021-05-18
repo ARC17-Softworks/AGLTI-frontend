@@ -12,9 +12,8 @@ import { PasswordField } from './PasswordField';
 import { useMutation } from '@apollo/client';
 import gql from 'graphql-tag';
 import { useToast } from '@chakra-ui/react';
-// import { Formik } from 'formik';
 
-export const RegisterForm = props => {
+export const RegisterForm = ({ setModalValues, onOpen, ...props }) => {
   const [values, setValues] = useState({
     name: '',
     email: '',
@@ -29,17 +28,15 @@ export const RegisterForm = props => {
 
   const [beginReg, { loading }] = useMutation(REGISTER_USER, {
     update(proxy, result) {
-      console.log(result);
-      props.setModalValues({
+      setModalValues({
         title: 'Email Sent!',
-        body:
-          'Thank you for signing up. An email has been sent to you with further signup instructions. Please also check your junk folder.',
+        body: 'Thank you for signing up. An email has been sent to you with further signup instructions. Please also check your junk folder.',
       });
-      props.onOpen();
+      onOpen();
     },
     variables: values,
     onError(err) {
-      if (err.graphQLErrors) {
+      if (err.graphQLErrors[0]) {
         if (err.graphQLErrors[0].message === 'Argument Validation Error') {
           toast({
             title: Object.values(
@@ -60,6 +57,14 @@ export const RegisterForm = props => {
             position: 'bottom-left',
           });
         }
+      } else {
+        toast({
+          title: err.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'bottom-left',
+        });
       }
     },
   });

@@ -1,16 +1,51 @@
 import React from 'react';
 import { ChakraProvider } from '@chakra-ui/react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import theme from './theme';
-import { Landing } from './components/pages/Landing';
+import { UnAuthenticatedRoute, AuthenticatedRoute } from './utils/Routes';
+import { Navbar } from './components/layout/Navbar';
+import { Landing } from './pages/Landing';
+import { Register } from './pages/Register';
+import { ResetPassword } from './pages/ResetPassword';
+import { NotFound } from './pages/NotFound';
+import { Dashboard } from './pages/LogedIn/Dashboard';
+
+import { AuthProvider } from './context/auth';
+import { CreateProfile } from './pages/LogedIn/CreateProfile';
+import { ChangePassword } from './pages/LogedIn/ChangePassword';
 
 function App() {
   return (
-    <ChakraProvider theme={theme}>
-      <Router>
-        <Route exact path="/" component={Landing} />
-      </Router>
-    </ChakraProvider>
+    <AuthProvider>
+      <ChakraProvider theme={theme}>
+        <Router>
+          <Navbar />
+          <Switch>
+            <UnAuthenticatedRoute exact path="/" component={Landing} />
+            <UnAuthenticatedRoute exact path="/register" component={Register} />
+            <UnAuthenticatedRoute
+              exact
+              path="/resetpassword"
+              component={ResetPassword}
+            />
+            <AuthenticatedRoute exact path="/dashboard" component={Dashboard} />
+            <AuthenticatedRoute
+              exact
+              path="/createprofile"
+              component={CreateProfile}
+            />
+            <AuthenticatedRoute
+              exact
+              path="/user/changepassword"
+              component={ChangePassword}
+            />
+            <Route>
+              <NotFound />
+            </Route>
+          </Switch>
+        </Router>
+      </ChakraProvider>
+    </AuthProvider>
   );
 }
 

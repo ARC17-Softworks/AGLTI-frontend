@@ -12,7 +12,7 @@ import { useMutation } from '@apollo/client';
 import gql from 'graphql-tag';
 import { useToast } from '@chakra-ui/react';
 
-export const ForgotPasswordForm = props => {
+export const ForgotPasswordForm = ({ setModalValues, onOpen, ...props }) => {
   const [email, setEmail] = useState('');
 
   const toast = useToast();
@@ -23,12 +23,11 @@ export const ForgotPasswordForm = props => {
 
   const [forgotPword, { loading }] = useMutation(FORGOT_PASSWORD, {
     update(proxy, result) {
-      console.log(result);
-      props.setModalValues({
+      setModalValues({
         title: 'Email Sent!',
         body: 'An Email with instructions to reset password has been sent.',
       });
-      props.onOpen();
+      onOpen();
     },
     variables: { email },
     onError(err) {
