@@ -1,11 +1,12 @@
 import React, { useReducer, createContext } from 'react';
 import { useQuery, gql } from '@apollo/client';
 
-const initialState = { user: null, profile: null };
+const initialState = { user: null, profile: null, load: false };
 
 const AuthContext = createContext({
   user: null,
   profile: null,
+  load: false,
   login: data => {},
   setProfile: data => {},
   logout: () => {},
@@ -16,7 +17,8 @@ const authReducer = (state, action) => {
     case 'LOGIN':
       return {
         ...state,
-        user: action.payload,
+        user: action.payload.user,
+        profile: action.payload.profile,
       };
     case 'SET_PROFILE':
       return {
@@ -37,10 +39,13 @@ const authReducer = (state, action) => {
 const AuthProvider = props => {
   const userPopulated = initialState.user !== null;
 
-  const { data } = useQuery(CHECK_AUTH, {
+  const { data, loading } = useQuery(CHECK_AUTH, {
     skip: userPopulated,
     fetchPolicy: 'network-only',
   });
+
+  initialState.load = loading;
+  // console.log(initialState.load);
 
   if (!userPopulated && data) {
     if (data.checkAuth.user) {
@@ -55,18 +60,13 @@ const AuthProvider = props => {
   const profilePopulated =
     initialState.profile !== null || initialState.user === null;
 
-  const { data: profileData } = useQuery(CHECK_PROFILE, {
-    skip: profilePopulated,
-    fetchPolicy: 'network-only',
-  });
-
-  if (!profilePopulated && profileData) {
-    if (profileData.checkProfile.profile) {
+  if (!profilePopulated && data) {
+    if (data.checkAuth.profile) {
       initialState.profile = {
-        skills: profileData.checkProfile.profile.skills,
-        activeProject: profileData.checkProfile.profile.activeProject
-          ? profileData.checkProfile.profile.activeProject.title
-          : profileData.checkProfile.profile.activeProject,
+        skills: data.checkAuth.profile.skills,
+        activeProject: data.checkAuth.profile.activeProject
+          ? data.checkAuth.profile.activeProject.title
+          : data.checkAuth.profile.activeProject,
       };
     }
   }
@@ -90,6 +90,7 @@ const AuthProvider = props => {
       value={{
         user: state.user,
         profile: state.profile,
+        load: state.load,
         login,
         setProfile,
         logout,
@@ -107,13 +108,7 @@ const CHECK_AUTH = gql`
         name
         avatar
       }
-    }
-  }
-`;
 
-const CHECK_PROFILE = gql`
-  query checkProfile {
-    checkProfile {
       profile {
         skills
         activeProject {

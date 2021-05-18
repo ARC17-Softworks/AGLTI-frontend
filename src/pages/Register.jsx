@@ -18,14 +18,17 @@ export const Register = props => {
     {
       update(proxy, result) {
         context.login({
-          id: result.data.completeRegistration.user.id,
-          name: result.data.completeRegistration.user.name,
-          avatar: result.data.completeRegistration.user.avatar,
+          user: {
+            id: result.data.completeRegistration.user.id,
+            name: result.data.completeRegistration.user.name,
+            avatar: result.data.completeRegistration.user.avatar,
+          },
+          profile: null,
         });
       },
       variables: { webtoken: parsed.token },
       onError(err) {
-        if (err.graphQLErrors) {
+        if (err.graphQLErrors[0]) {
           if (err.graphQLErrors[0].message === 'Argument Validation Error') {
             setErrorMessage(
               Object.values(

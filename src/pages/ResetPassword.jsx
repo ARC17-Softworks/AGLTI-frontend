@@ -21,9 +21,19 @@ export const ResetPassword = props => {
   const [resetPword, { loading }] = useMutation(RESET_PASSWORD, {
     update(proxy, result) {
       context.login({
-        id: result.data.resetPassword.user.id,
-        name: result.data.resetPassword.user.name,
-        avatar: result.data.resetPassword.user.avatar,
+        user: {
+          id: result.data.resetPassword.user.id,
+          name: result.data.resetPassword.user.name,
+          avatar: result.data.resetPassword.user.avatar,
+        },
+        profile: result.data.resetPassword.profile
+          ? {
+              skills: result.data.resetPassword.profile.skills,
+              activeProject: result.data.resetPassword.profile.activeProject
+                ? result.data.resetPassword.profile.activeProject.title
+                : result.data.resetPassword.profile.activeProject,
+            }
+          : null,
       });
       toast({
         title: 'password reset',
@@ -35,9 +45,7 @@ export const ResetPassword = props => {
     },
     variables: { resettoken: parsed.token, newPassword: values.password },
     onError(err) {
-      console.log(err);
-      if (err.graphQLErrors) {
-        console.log(err.graphQLErrors);
+      if (err.graphQLErrors[0]) {
         if (err.graphQLErrors[0].message === 'Argument Validation Error') {
           toast({
             title: Object.values(
@@ -66,6 +74,14 @@ export const ResetPassword = props => {
             position: 'bottom-left',
           });
         }
+      } else {
+        toast({
+          title: err.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'bottom-left',
+        });
       }
     },
   });
@@ -147,6 +163,13 @@ const RESET_PASSWORD = gql`
         id
         name
         avatar
+      }
+
+      profile {
+        skills
+        activeProject {
+          title
+        }
       }
     }
   }

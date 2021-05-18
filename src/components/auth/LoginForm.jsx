@@ -36,14 +36,24 @@ export const LoginForm = props => {
   const [loginUser, { loading }] = useMutation(LOGIN_USER, {
     update(proxy, result) {
       context.login({
-        id: result.data.login.user.id,
-        name: result.data.login.user.name,
-        avatar: result.data.login.user.avatar,
+        user: {
+          id: result.data.login.user.id,
+          name: result.data.login.user.name,
+          avatar: result.data.login.user.avatar,
+        },
+        profile: result.data.login.profile
+          ? {
+              skills: result.data.login.profile.skills,
+              activeProject: result.data.login.profile.activeProject
+                ? result.data.login.profile.activeProject.title
+                : result.data.login.profile.activeProject,
+            }
+          : null,
       });
     },
     variables: values,
     onError(err) {
-      if (err.graphQLErrors) {
+      if (err.graphQLErrors[0]) {
         if (err.graphQLErrors[0].message === 'Argument Validation Error') {
           toast({
             title: Object.values(
@@ -64,6 +74,14 @@ export const LoginForm = props => {
             position: 'bottom-left',
           });
         }
+      } else {
+        toast({
+          title: err.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'bottom-left',
+        });
       }
     },
   });
@@ -200,6 +218,13 @@ const LOGIN_USER = gql`
         id
         name
         avatar
+      }
+
+      profile {
+        skills
+        activeProject {
+          title
+        }
       }
     }
   }
