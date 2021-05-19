@@ -106,7 +106,7 @@ export const DashboardSideNav = () => {
             leftIcon={<Users weight="fill" />}
             size="md"
             as={RouterLink}
-            to="/dashboard/applied"
+            // to="/dashboard/contacts"
             w="full"
           >
             Contacts
@@ -116,7 +116,7 @@ export const DashboardSideNav = () => {
             leftIcon={<Chats weight="fill" />}
             size="md"
             as={RouterLink}
-            to="/dashboard/applied"
+            // to="/dashboard/messages"
             w="full"
           >
             Messages

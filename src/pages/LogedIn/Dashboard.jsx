@@ -1,11 +1,18 @@
 import React, { useContext } from 'react';
-import { Grid, GridItem, Box, Image } from '@chakra-ui/react';
-import { Redirect } from 'react-router-dom';
+import { Grid, GridItem, Box } from '@chakra-ui/react';
+import {
+  Redirect,
+  Switch,
+  BrowserRouter as Route,
+  useRouteMatch,
+} from 'react-router-dom';
 import { DashboardSideNav } from '../../components/layout/DashboardSideNav';
 import { AuthContext } from '../../context/auth';
+import { ProfileArea } from '../../components/dashboard/ProfileArea';
 
 export const Dashboard = () => {
   const context = useContext(AuthContext);
+  const { path } = useRouteMatch();
 
   if (!context.profile) {
     return <Redirect to="/createprofile" />;
@@ -19,7 +26,11 @@ export const Dashboard = () => {
         </GridItem>
         <GridItem>
           <Box maxW="container.xl" px={10} pt={2} mx="auto">
-            <Image boxSize="200px" src={context.user.avatar} />
+            <Switch>
+              <Route exact path={path}>
+                <ProfileArea />
+              </Route>
+            </Switch>
           </Box>
         </GridItem>
       </Grid>
