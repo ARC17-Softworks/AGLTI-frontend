@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Box, Grid, Heading, Text, Divider, Avatar, Button, Stack, Icon, useDisclosure } from "@chakra-ui/core";
 import { Fade, ScaleFade, Slide, SlideFade } from "@chakra-ui/react";
 
-
 function ProjectInfoSection() {
     let projectList = [
         {
           id: 1,
           name: "Bilal Rizwan",
           description:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. ",
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere dui vel urna egestas rutrum.",
           imageURL: "https://bit.ly/broken-link",
           date: "5/5/2021"
         }
@@ -31,7 +30,7 @@ function ProjectInfoSection() {
                     <Stack isInline spacing="auto" ml="8%" mr="40px">
                         <Heading textAlign="left" size="2xl" mt="10px">Project Title</Heading>
                     </Stack>
-                        <Text ml="8%" pt="2%" textAlign="left">
+                        <Text ml="8%" pt="2%" overflow="auto" w="80%" height="25vh" textAlign="left" >
                             {project.description}
                         </Text>
                         <Divider pt="2%" ml="8%" mr="4%" borderColor="#1A202C" borderWidth="3px" />

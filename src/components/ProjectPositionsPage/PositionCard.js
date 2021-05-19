@@ -10,12 +10,12 @@ function PositionCard(props) {
                                 <Heading textAlign="center" mt="1%" as="h6" size="s">
                                     {props.position.title}
                                 </Heading>
-                                <Text ml="8%" mt="2%" fontSize="xs">
+                                <Text ml="8%" mt="2%" overflow="auto"  h="27vh" fontSize="xs">
                                 {props.position.description}
                                 </Text>
                                 {skillArr.map((skill) => {
                                 return(
-                                    <Tag isInline size="xs" bg="#718096" ml="3px" mr="3px" borderRadius="lg" color="white">{skill}</Tag>
+                                    <Tag isInline size="xs" bg="#718096" ml="3px" mt="9px" mr="3px" borderRadius="lg" color="white">{skill}</Tag>
                                 );
                             }
                             )}
