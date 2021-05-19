@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Box, Grid, SimpleGrid, Stack,  Heading, Icon, Text, Button, Tag, CloseButton, Badge, Avatar, AvatarBadge, Divider } from "@chakra-ui/core";
+import SearchPage from '../SearchPage/SearchPage';
 
 function PositionCard(props) {
     let skillArr = props.position.skills;

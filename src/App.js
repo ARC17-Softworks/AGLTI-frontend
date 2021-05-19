@@ -10,6 +10,7 @@ import ProjectMembersSection from './components/ProjectMembersPage/ProjectMember
 import ProjectPositionsSection from './components/ProjectPositionsPage/ProjectPositions';
 import DiscussionSection from './components/DiscussionPage/Discussions';
 import Kanban from './components/Kanban';
+import SearchPage from './components/SearchPage/SearchPage';
 import {BrowserRouter as Router ,Route, Switch} from 'react-router-dom';
 import useToken from './useToken';
 import './App.css';
@@ -29,17 +30,17 @@ function App() {
   return (
     <ApolloProvider client={client}>
     <div className="App">
-      
+      <SearchPage />
       <HeaderBar />  
       <Router>
         <Navbar />
-          <Switch>
+          {/* <Switch>
             <Route exact path='/info' component={ProjectInfoSection}  />
             <Route exact path='/member' component={ProjectMembersSection}  />
             <Route exact path='/position' component={ProjectPositionsSection}  />
             <Route exact path='/kanban' component={Kanban}  />
             <Route exact path='/disccussion' component={DiscussionSection}  />
-          </Switch>
+          </Switch> */}
       </Router>
     </div>
     </ApolloProvider>
