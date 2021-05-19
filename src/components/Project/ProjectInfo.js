@@ -30,7 +30,6 @@ function ProjectInfoSection() {
                     <Box h="80vh" w="80%" ml="8%" mt="6%" borderRadius="lg" bg="#2D3748" alignContent="center" key={id} >
                     <Stack isInline spacing="auto" ml="8%" mr="40px">
                         <Heading textAlign="left" size="2xl" mt="10px">Project Title</Heading>
-                        <Icon name="edit" size="24px" mt="20px"/>
                     </Stack>
                         <Text ml="8%" pt="2%" textAlign="left">
                             {project.description}
