@@ -4,7 +4,7 @@ import { useMutation, gql } from '@apollo/client';
 import { PasswordField } from '../../components/auth/PasswordField';
 import { useToast } from '@chakra-ui/react';
 
-export const ChangePassword = props => {
+export const ChangePassword = ({ to, staticContext, ...props }) => {
   const [values, setValues] = useState({
     currentPassword: '',
     newPassword: '',
@@ -98,7 +98,13 @@ export const ChangePassword = props => {
 
   return (
     <Box px={10} py={3}>
-      <Center maxWidth="container.xl" h="50vh" margin="auto" pt={16} px={40}>
+      <Center
+        maxWidth="container.xl"
+        h="50vh"
+        margin="auto"
+        pt={16}
+        px={{ lg: 40, md: 50 }}
+      >
         <chakra.form onSubmit={onSubmit} {...props}>
           <Stack spacing="6">
             <Heading textAlign="center" size="xl" fontWeight="extrabold">
