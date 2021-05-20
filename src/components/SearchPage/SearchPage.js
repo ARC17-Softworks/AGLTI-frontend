@@ -15,6 +15,8 @@ import {
     Wrap,
     WrapItem,
   } from "@chakra-ui/react";
+  import Checkbox from '@material-ui/core/Checkbox';
+
 import SearchBox from '../search-box/search-box.component';
 
 function SearchPage() {
@@ -25,6 +27,7 @@ function SearchPage() {
             <Table variant="simple" w="80%"  ml="8%" mt="6%">
                 <Thead>
                     <Tr color="black">
+                        <Th></Th>
                         <Th>Developer</Th>
                         <Th>Skills</Th>
                         <Th isNumeric>Rating</Th>
@@ -32,6 +35,11 @@ function SearchPage() {
                 </Thead>
                 <Tbody bg="#2D3748">
                     <Tr>
+                        <Td><Checkbox
+                                color="primary"
+                                inputProps={{ 'aria-label': 'secondary checkbox' }}
+                            />
+                        </Td>
                         <Td>
                             <Wrap >
                                 <WrapItem>
