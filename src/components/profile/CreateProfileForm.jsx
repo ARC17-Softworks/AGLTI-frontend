@@ -14,18 +14,25 @@ import {
 } from '@chakra-ui/react';
 import MultiSelect from '../form/MultiSelect';
 import { skillsList } from '../../data/skillsList';
-import { useMutation, gql } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { AuthContext } from '../../context/auth';
+import { SET_PROFILE } from '../../graphql';
 
 export const CreateProfileForm = props => {
   const context = useContext(AuthContext);
   const [values, setValues] = useState({
     skills: [],
+    location: '',
+    bio: '',
+    website: '',
+    github: '',
+    linkedin: '',
+    dribble: '',
   });
 
   const toast = useToast();
 
-  const [createProfile, { loading }] = useMutation(CREATE_PROFILE, {
+  const [createProfile, { loading }] = useMutation(SET_PROFILE, {
     update(proxy, result) {
       context.setProfile({
         skills: result.data.setProfile.profile.skills,
@@ -79,9 +86,11 @@ export const CreateProfileForm = props => {
   };
 
   const onSubmit = e => {
-    if (values.github) values.github = `github.com/${values.github}`;
-    if (values.linkedin) values.linkedin = `linkedin.com/in/${values.linkedin}`;
-    if (values.dribble) values.dribble = `dribbble.com/${values.dribble}`;
+    if (values.github.length > 0) values.github = `github.com/${values.github}`;
+    if (values.linkedin.length > 0)
+      values.linkedin = `linkedin.com/in/${values.linkedin}`;
+    if (values.dribble.length > 0)
+      values.dribble = `dribbble.com/${values.dribble}`;
     e.preventDefault();
     createProfile();
   };
@@ -168,38 +177,3 @@ export const CreateProfileForm = props => {
     </chakra.form>
   );
 };
-
-const CREATE_PROFILE = gql`
-  mutation setProfile(
-    $name: String
-    $bio: String
-    $location: String
-    $skills: [String!]!
-    $website: String
-    $github: String
-    $linkedIn: String
-    $dribble: String
-  ) {
-    setProfile(
-      input: {
-        name: $name
-        bio: $bio
-        location: $location
-        skills: $skills
-        links: {
-          website: $website
-          github: $github
-          linkedin: $linkedIn
-          dribble: $dribble
-        }
-      }
-    ) {
-      profile {
-        skills
-        activeProject {
-          title
-        }
-      }
-    }
-  }
-`;

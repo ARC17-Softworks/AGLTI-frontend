@@ -20,16 +20,18 @@ import { Link as RouterLink } from 'react-router-dom';
 import { AuthContext } from '../../context/auth';
 import { ColorModeSwitcher } from '../../ColorModeSwitcher';
 import { ReactComponent as Logo } from '../../navlogo.svg';
-import { useMutation, gql } from '@apollo/client';
+import { useMutation, useApolloClient, gql } from '@apollo/client';
 
 export const SignedInNav = () => {
   const context = useContext(AuthContext);
   const bg = useColorModeValue('white', 'gray.900');
   const toast = useToast();
+  const client = useApolloClient();
 
   const [logoutUser] = useMutation(LOGOUT_USER, {
     update() {
       context.logout();
+      client.resetStore();
     },
     onError(err) {
       if (err.graphQLErrors) {
@@ -61,6 +63,7 @@ export const SignedInNav = () => {
     <chakra.header
       bg={bg}
       w="full"
+      h="56px"
       px={4}
       py={2}
       shadow="md"

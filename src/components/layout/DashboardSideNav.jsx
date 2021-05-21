@@ -5,6 +5,7 @@ import {
   VStack,
   Button,
   Divider,
+  Circle,
 } from '@chakra-ui/react';
 import { AddIcon, SearchIcon, ArrowRightIcon } from '@chakra-ui/icons';
 import { ArchiveTray, PaperPlaneTilt, Users, Chats } from 'phosphor-react';
@@ -12,9 +13,11 @@ import { Link as RouterLink } from 'react-router-dom';
 import { DividerWithText } from '../misc/DividerWithText';
 
 import { AuthContext } from '../../context/auth';
+import { DashboardContext } from '../../context/dashboard';
 
 export const DashboardSideNav = () => {
-  const context = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
+  const dashboardContext = useContext(DashboardContext);
   const bg = useColorModeValue('gray.200', 'gray.700');
   const toProject = (
     <Button
@@ -76,7 +79,12 @@ export const DashboardSideNav = () => {
         to="/dashboard/offers"
         w="full"
       >
-        Offers
+        Offers{' '}
+        {dashboardContext.offers > 0 && (
+          <Circle bg="red" size={4} color="white" fontSize="14px">
+            {dashboardContext.offers}
+          </Circle>
+        )}
       </Button>
     </>
   );
@@ -96,16 +104,16 @@ export const DashboardSideNav = () => {
     >
       <VStack pt={2} w="full" spacing={6}>
         <VStack pt={2} w="full">
-          {context.profile.activeProject ? toProject : noProject}
+          {authContext.profile.activeProject ? toProject : noProject}
         </VStack>
         <Divider />
         <VStack pt={2} w="full">
-          {!context.profile.activeProject && appliedAndOffers}
+          {!authContext.profile.activeProject && appliedAndOffers}
           <Button
             variant="ghost"
             leftIcon={<Users weight="fill" />}
             size="md"
-            as={RouterLink}
+            // as={RouterLink}
             // to="/dashboard/contacts"
             w="full"
           >
@@ -115,7 +123,7 @@ export const DashboardSideNav = () => {
             variant="ghost"
             leftIcon={<Chats weight="fill" />}
             size="md"
-            as={RouterLink}
+            // as={RouterLink}
             // to="/dashboard/messages"
             w="full"
           >
