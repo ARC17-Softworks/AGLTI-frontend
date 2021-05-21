@@ -8,7 +8,7 @@ export const SET_PROFILE = gql`
     $skills: [String!]!
     $website: String
     $github: String
-    $linkedIn: String
+    $linkedin: String
     $dribble: String
   ) {
     setProfile(
@@ -20,7 +20,7 @@ export const SET_PROFILE = gql`
         links: {
           website: $website
           github: $github
-          linkedin: $linkedIn
+          linkedin: $linkedin
           dribble: $dribble
         }
       }

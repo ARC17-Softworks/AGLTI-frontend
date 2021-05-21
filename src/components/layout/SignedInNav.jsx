@@ -69,6 +69,7 @@ export const SignedInNav = () => {
       shadow="md"
       position="sticky"
       top="0"
+      zIndex={1}
     >
       <Flex alignItems="center" justifyContent="space-between" mx="auto">
         <HStack display="flex" spacing={3} alignItems="center">

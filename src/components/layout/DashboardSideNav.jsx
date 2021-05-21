@@ -18,7 +18,7 @@ import { DashboardContext } from '../../context/dashboard';
 export const DashboardSideNav = () => {
   const authContext = useContext(AuthContext);
   const dashboardContext = useContext(DashboardContext);
-  const bg = useColorModeValue('gray.200', 'gray.700');
+  const bg = useColorModeValue('gray.50', 'gray.700');
   const toProject = (
     <Button
       rightIcon={<ArrowRightIcon />}

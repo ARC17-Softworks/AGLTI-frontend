@@ -18,17 +18,27 @@ import { useMutation } from '@apollo/client';
 import { AuthContext } from '../../context/auth';
 import { SET_PROFILE } from '../../graphql';
 
-export const CreateProfileForm = props => {
+export const SetProfileForm = ({
+  formTitle,
+  buttonText,
+  initialValues,
+  refetch,
+  onClose,
+  ...props
+}) => {
   const context = useContext(AuthContext);
-  const [values, setValues] = useState({
-    skills: [],
-    location: '',
-    bio: '',
-    website: '',
-    github: '',
-    linkedin: '',
-    dribble: '',
-  });
+  const initialState = initialValues
+    ? initialValues
+    : {
+        skills: [],
+        location: '',
+        bio: '',
+        website: '',
+        github: '',
+        linkedin: '',
+        dribble: '',
+      };
+  const [values, setValues] = useState(initialState);
 
   const toast = useToast();
 
@@ -40,8 +50,35 @@ export const CreateProfileForm = props => {
           ? result.data.setProfile.profile.activeProject.title
           : result.data.setProfile.profile.activeProject,
       });
+      if (refetch && onClose) {
+        refetch();
+        onClose();
+      }
     },
-    variables: values,
+    variables: {
+      skills: values.skills,
+      location:
+        values.location && values.location.length > 0
+          ? values.location
+          : undefined,
+      bio: values.bio && values.bio.length > 0 ? values.bio : undefined,
+      website:
+        values.website && values.website.length > 0
+          ? values.website
+          : undefined,
+      github:
+        values.github && values.github.length > 0
+          ? `https://github.com/${values.github}`
+          : undefined,
+      linkedin:
+        values.linkedin && values.linkedin.length > 0
+          ? `https://linkedin.com/in/${values.linkedin}`
+          : undefined,
+      dribble:
+        values.dribble && values.dribble.length > 0
+          ? `https://dribbble.com/${values.dribble}`
+          : undefined,
+    },
     onError(err) {
       if (err.graphQLErrors[0]) {
         if (err.graphQLErrors[0].message === 'Argument Validation Error') {
@@ -86,11 +123,6 @@ export const CreateProfileForm = props => {
   };
 
   const onSubmit = e => {
-    if (values.github.length > 0) values.github = `github.com/${values.github}`;
-    if (values.linkedin.length > 0)
-      values.linkedin = `linkedin.com/in/${values.linkedin}`;
-    if (values.dribble.length > 0)
-      values.dribble = `dribbble.com/${values.dribble}`;
     e.preventDefault();
     createProfile();
   };
@@ -99,11 +131,16 @@ export const CreateProfileForm = props => {
     <chakra.form onSubmit={onSubmit} {...props}>
       <Stack spacing="6">
         <Heading textAlign="center" size="xl" fontWeight="extrabold">
-          Create Profile
+          {formTitle ? formTitle : 'Create Profile'}
         </Heading>
         <FormControl id="skills" isRequired>
           <FormLabel>Skills</FormLabel>
           <MultiSelect
+            {...(values.skills.length > 0 && {
+              defaultValue: skillsList.filter(skill =>
+                values.skills.includes(skill.label)
+              ),
+            })}
             name="skills"
             options={skillsList}
             isMulti
@@ -171,7 +208,7 @@ export const CreateProfileForm = props => {
           loadingText="Submitting"
           spinnerPlacement="end"
         >
-          Register
+          {buttonText ? buttonText : 'Register'}
         </Button>
       </Stack>
     </chakra.form>
