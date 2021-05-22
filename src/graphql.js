@@ -152,3 +152,18 @@ export const DASHBOARD_QUERY = gql`
     }
   }
 `;
+
+export const GET_GITHUB_REPOS = gql`
+  query getGitHubRepos($username: String!) {
+    getGitHubRepos(username: $username) {
+      repositories {
+        name
+        description
+        url
+        primaryLanguage {
+          name
+        }
+      }
+    }
+  }
+`;

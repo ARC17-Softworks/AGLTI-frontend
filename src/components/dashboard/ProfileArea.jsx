@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Image,
   HStack,
@@ -18,6 +18,9 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  LinkBox,
+  LinkOverlay,
+  Heading,
 } from '@chakra-ui/react';
 import { EditIcon, ExternalLinkIcon, AddIcon } from '@chakra-ui/icons';
 import {
@@ -28,8 +31,8 @@ import {
   DribbbleLogo,
 } from 'phosphor-react';
 import { AuthContext } from '../../context/auth';
-import { useQuery, NetworkStatus } from '@apollo/client';
-import { DASHBOARD_QUERY } from '../../graphql';
+import { useQuery, useApolloClient, NetworkStatus } from '@apollo/client';
+import { DASHBOARD_QUERY, GET_GITHUB_REPOS } from '../../graphql';
 import { Loading } from '../Loading';
 import { DashboardContext } from '../../context/dashboard';
 import { SetProfileForm } from '../profile/SetProfileForm';
@@ -38,6 +41,10 @@ export const ProfileArea = () => {
   const authContext = useContext(AuthContext);
   const { setOffers } = useContext(DashboardContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const [githubRepos, setGithubRepos] = useState([]);
+
+  const client = useApolloClient();
   const { data, loading, refetch, networkStatus } = useQuery(DASHBOARD_QUERY, {
     fetchPolicy: 'cache-and-network',
   });
@@ -52,6 +59,29 @@ export const ProfileArea = () => {
     }
     //eslint-disable-next-line
   }, [offers]);
+
+  useEffect(() => {
+    async function fetchData() {
+      if (
+        !(
+          loading ||
+          networkStatus === NetworkStatus.refetch ||
+          !data.getMe.profile.links.github
+        )
+      ) {
+        const username = data.getMe.profile.links.github.split(
+          'https://github.com/'
+        )[1];
+        const { data: gitHubReposData } = await client.query({
+          query: GET_GITHUB_REPOS,
+          variables: { username },
+          fetchPolicy: 'network-only',
+        });
+        setGithubRepos(gitHubReposData.getGitHubRepos.repositories);
+      }
+    }
+    fetchData();
+  }, [client, data, loading, networkStatus]);
 
   if (loading || networkStatus === NetworkStatus.refetch) {
     return <Loading />;
@@ -166,6 +196,31 @@ export const ProfileArea = () => {
           </Tooltip>
         </Flex>
         <Divider />
+        {githubRepos.length > 0 && (
+          <>
+            <Text fontSize="4xl">GitHub Repositories</Text>
+            <Divider />
+            {githubRepos.map(repo => (
+              <LinkBox
+                w="full"
+                p="3"
+                borderWidth="1px"
+                rounded="md"
+                key={repo.url}
+              >
+                <Heading size="md" my="2">
+                  <LinkOverlay href={repo.url}>{repo.name}</LinkOverlay>
+                </Heading>
+                {repo.primaryLanguage && (
+                  <Badge>{repo.primaryLanguage.name}</Badge>
+                )}
+                <Text fontStyle="italic">
+                  {repo.description ? repo.description : 'no description'}
+                </Text>
+              </LinkBox>
+            ))}
+          </>
+        )}
       </VStack>
     </HStack>
   );
