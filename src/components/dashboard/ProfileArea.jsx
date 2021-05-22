@@ -62,22 +62,20 @@ export const ProfileArea = () => {
 
   useEffect(() => {
     async function fetchData() {
-      if (
-        !(
-          loading ||
-          networkStatus === NetworkStatus.refetch ||
-          !data.getMe.profile.links.github
-        )
-      ) {
-        const username = data.getMe.profile.links.github.split(
-          'https://github.com/'
-        )[1];
-        const { data: gitHubReposData } = await client.query({
-          query: GET_GITHUB_REPOS,
-          variables: { username },
-          fetchPolicy: 'network-only',
-        });
-        setGithubRepos(gitHubReposData.getGitHubRepos.repositories);
+      if (!(loading || networkStatus === NetworkStatus.refetch)) {
+        if (data.getMe.profile.links.github) {
+          const username = data.getMe.profile.links.github.split(
+            'https://github.com/'
+          )[1];
+          const { data: gitHubReposData } = await client.query({
+            query: GET_GITHUB_REPOS,
+            variables: { username },
+            fetchPolicy: 'no-cache',
+          });
+          setGithubRepos(gitHubReposData.getGitHubRepos.repositories);
+        } else {
+          setGithubRepos([]);
+        }
       }
     }
     fetchData();
