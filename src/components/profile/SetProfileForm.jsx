@@ -42,7 +42,7 @@ export const SetProfileForm = ({
 
   const toast = useToast();
 
-  const [createProfile, { loading }] = useMutation(SET_PROFILE, {
+  const [setProfile, { loading }] = useMutation(SET_PROFILE, {
     update(proxy, result) {
       context.setProfile({
         skills: result.data.setProfile.profile.skills,
@@ -124,7 +124,7 @@ export const SetProfileForm = ({
 
   const onSubmit = e => {
     e.preventDefault();
-    createProfile();
+    setProfile();
   };
 
   return (

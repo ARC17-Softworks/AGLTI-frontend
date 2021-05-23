@@ -8,7 +8,7 @@ import {
   Heading,
 } from '@chakra-ui/react';
 import React, { useState } from 'react';
-import { PasswordField } from './PasswordField';
+import { PasswordField } from '../form/PasswordField';
 import { useMutation } from '@apollo/client';
 import gql from 'graphql-tag';
 import { useToast } from '@chakra-ui/react';

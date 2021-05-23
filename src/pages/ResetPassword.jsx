@@ -3,7 +3,7 @@ import React, { useState, useContext } from 'react';
 import { Redirect } from 'react-router-dom';
 import queryString from 'query-string';
 import { useMutation, gql } from '@apollo/client';
-import { PasswordField } from '../components/auth/PasswordField';
+import { PasswordField } from '../components/form/PasswordField';
 import { useToast } from '@chakra-ui/react';
 import { AuthContext } from '../context/auth';
 

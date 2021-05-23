@@ -8,7 +8,7 @@ import {
   Circle,
 } from '@chakra-ui/react';
 import { AddIcon, SearchIcon, ArrowRightIcon } from '@chakra-ui/icons';
-import { ArchiveTray, PaperPlaneTilt, Users, Chats } from 'phosphor-react';
+import { ArchiveTray, PaperPlaneTilt } from 'phosphor-react'; //Users, Chats
 import { Link as RouterLink } from 'react-router-dom';
 import { DividerWithText } from '../misc/DividerWithText';
 
@@ -109,7 +109,7 @@ export const DashboardSideNav = () => {
         <Divider />
         <VStack pt={2} w="full">
           {!authContext.profile.activeProject && appliedAndOffers}
-          <Button
+          {/* <Button
             variant="ghost"
             leftIcon={<Users weight="fill" />}
             size="md"
@@ -128,7 +128,7 @@ export const DashboardSideNav = () => {
             w="full"
           >
             Messages
-          </Button>
+          </Button> */}
         </VStack>
       </VStack>
     </Flex>

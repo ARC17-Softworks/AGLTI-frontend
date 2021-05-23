@@ -1,7 +1,7 @@
 import { Button, chakra, Box, Center, Heading, Stack } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { useMutation, gql } from '@apollo/client';
-import { PasswordField } from '../../components/auth/PasswordField';
+import { PasswordField } from '../../components/form/PasswordField';
 import { useToast } from '@chakra-ui/react';
 
 export const ChangePassword = ({ to, staticContext, ...props }) => {
