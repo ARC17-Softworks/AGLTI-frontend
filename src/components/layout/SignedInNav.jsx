@@ -101,7 +101,9 @@ export const SignedInNav = () => {
             </MenuButton>
             <MenuList>
               <MenuGroup title={context.user.name}>
-                <MenuItem>My Profile</MenuItem>
+                <MenuItem as={RouterLink} to={`/user/${context.user.id}`}>
+                  My Profile
+                </MenuItem>
               </MenuGroup>
               <MenuDivider />
               <MenuGroup>
