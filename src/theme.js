@@ -7,5 +7,14 @@ const config = {
   useSystemColorMode: false,
 };
 // 3. extend the theme
-const theme = extendTheme({ config });
+const theme = extendTheme({
+  styles: {
+    global: {
+      'body, #root': {
+        minHeight: '100vh',
+      },
+    },
+  },
+  config,
+});
 export default theme;

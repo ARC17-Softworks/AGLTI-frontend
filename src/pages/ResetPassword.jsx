@@ -3,7 +3,7 @@ import React, { useState, useContext } from 'react';
 import { Redirect } from 'react-router-dom';
 import queryString from 'query-string';
 import { useMutation, gql } from '@apollo/client';
-import { PasswordField } from '../components/auth/PasswordField';
+import { PasswordField } from '../components/form/PasswordField';
 import { useToast } from '@chakra-ui/react';
 import { AuthContext } from '../context/auth';
 
@@ -119,7 +119,13 @@ export const ResetPassword = props => {
 
   return (
     <Box px={10} py={3}>
-      <Center maxWidth="container.xl" h="50vh" margin="auto" pt={16} px={40}>
+      <Center
+        maxWidth="container.xl"
+        h="50vh"
+        margin="auto"
+        pt={16}
+        px={{ lg: 40, md: 50 }}
+      >
         <chakra.form onSubmit={onSubmit} {...props}>
           <Stack spacing="6">
             <Heading textAlign="center" size="xl" fontWeight="extrabold">

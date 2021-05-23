@@ -14,23 +14,24 @@ import {
   MenuItem,
   MenuDivider,
   useToast,
-  Link,
 } from '@chakra-ui/react';
 import { House } from 'phosphor-react';
 import { Link as RouterLink } from 'react-router-dom';
 import { AuthContext } from '../../context/auth';
 import { ColorModeSwitcher } from '../../ColorModeSwitcher';
 import { ReactComponent as Logo } from '../../navlogo.svg';
-import { useMutation, gql } from '@apollo/client';
+import { useMutation, useApolloClient, gql } from '@apollo/client';
 
 export const SignedInNav = () => {
   const context = useContext(AuthContext);
-  const bg = useColorModeValue('white', 'gray.800');
+  const bg = useColorModeValue('white', 'gray.900');
   const toast = useToast();
+  const client = useApolloClient();
 
   const [logoutUser] = useMutation(LOGOUT_USER, {
     update() {
       context.logout();
+      client.resetStore();
     },
     onError(err) {
       if (err.graphQLErrors) {
@@ -59,59 +60,61 @@ export const SignedInNav = () => {
   });
 
   return (
-    <React.Fragment>
-      <chakra.header bg={bg} w="full" px={4} py={4} shadow="md">
-        <Flex alignItems="center" justifyContent="space-between" mx="auto">
-          <HStack display="flex" spacing={3} alignItems="center">
-            <Logo width="100px" fill="currentColor" />
+    <chakra.header
+      bg={bg}
+      w="full"
+      h="56px"
+      px={4}
+      py={2}
+      shadow="md"
+      position="sticky"
+      top="0"
+      zIndex={1}
+    >
+      <Flex alignItems="center" justifyContent="space-between" mx="auto">
+        <HStack display="flex" spacing={3} alignItems="center">
+          <Logo width="100px" fill="currentColor" />
 
-            <HStack spacing={3}>
-              <Link as={RouterLink} to="/dashboard">
-                <Button
-                  variant="ghost"
-                  leftIcon={<House weight="fill" />}
-                  size="sm"
-                >
-                  Dashboard
-                </Button>
-              </Link>
-            </HStack>
+          <HStack spacing={3}>
+            <Button
+              variant="ghost"
+              leftIcon={<House weight="fill" />}
+              size="sm"
+              as={RouterLink}
+              to="/dashboard"
+            >
+              Dashboard
+            </Button>
           </HStack>
-          <HStack spacing={3} alignItems="center">
-            <ColorModeSwitcher />
+        </HStack>
+        <HStack spacing={3} alignItems="center">
+          <ColorModeSwitcher />
 
-            <Menu>
-              <MenuButton
-                as={IconButton}
-                variant="ghost"
-                isRound={true}
-                size="sm"
-              >
-                <Avatar size="sm" src={context.user.avatar} />
-              </MenuButton>
-              <MenuList>
-                <MenuGroup title={context.user.name}>
-                  <MenuItem>My Profile</MenuItem>
-                </MenuGroup>
-                <MenuDivider />
-                <MenuGroup>
-                  <MenuItem>
-                    <Link
-                      as={RouterLink}
-                      to="/user/changepassword"
-                      style={{ textDecoration: 'none' }}
-                    >
-                      Change Password
-                    </Link>
-                  </MenuItem>
-                  <MenuItem onClick={() => logoutUser()}>Logout</MenuItem>
-                </MenuGroup>
-              </MenuList>
-            </Menu>
-          </HStack>
-        </Flex>
-      </chakra.header>
-    </React.Fragment>
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              variant="ghost"
+              isRound={true}
+              size="sm"
+            >
+              <Avatar size="sm" src={context.user.avatar} />
+            </MenuButton>
+            <MenuList>
+              <MenuGroup title={context.user.name}>
+                <MenuItem>My Profile</MenuItem>
+              </MenuGroup>
+              <MenuDivider />
+              <MenuGroup>
+                <MenuItem as={RouterLink} to="/user/changepassword">
+                  Change Password
+                </MenuItem>
+                <MenuItem onClick={() => logoutUser()}>Logout</MenuItem>
+              </MenuGroup>
+            </MenuList>
+          </Menu>
+        </HStack>
+      </Flex>
+    </chakra.header>
   );
 };
 

@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { CloseIcon } from '@chakra-ui/icons';
 import React, { useState, useContext } from 'react';
-import { PasswordField } from './PasswordField';
+import { PasswordField } from '../form/PasswordField';
 import { useMutation, useApolloClient, gql } from '@apollo/client';
 
 import { AuthContext } from '../../context/auth';

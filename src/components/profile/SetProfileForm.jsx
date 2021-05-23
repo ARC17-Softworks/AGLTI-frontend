@@ -14,18 +14,35 @@ import {
 } from '@chakra-ui/react';
 import MultiSelect from '../form/MultiSelect';
 import { skillsList } from '../../data/skillsList';
-import { useMutation, gql } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { AuthContext } from '../../context/auth';
+import { SET_PROFILE } from '../../graphql';
 
-export const CreateProfileForm = props => {
+export const SetProfileForm = ({
+  formTitle,
+  buttonText,
+  initialValues,
+  refetch,
+  onClose,
+  ...props
+}) => {
   const context = useContext(AuthContext);
-  const [values, setValues] = useState({
-    skills: [],
-  });
+  const initialState = initialValues
+    ? initialValues
+    : {
+        skills: [],
+        location: '',
+        bio: '',
+        website: '',
+        github: '',
+        linkedin: '',
+        dribble: '',
+      };
+  const [values, setValues] = useState(initialState);
 
   const toast = useToast();
 
-  const [createProfile, { loading }] = useMutation(CREATE_PROFILE, {
+  const [setProfile, { loading }] = useMutation(SET_PROFILE, {
     update(proxy, result) {
       context.setProfile({
         skills: result.data.setProfile.profile.skills,
@@ -33,8 +50,35 @@ export const CreateProfileForm = props => {
           ? result.data.setProfile.profile.activeProject.title
           : result.data.setProfile.profile.activeProject,
       });
+      if (refetch && onClose) {
+        refetch();
+        onClose();
+      }
     },
-    variables: values,
+    variables: {
+      skills: values.skills,
+      location:
+        values.location && values.location.length > 0
+          ? values.location
+          : undefined,
+      bio: values.bio && values.bio.length > 0 ? values.bio : undefined,
+      website:
+        values.website && values.website.length > 0
+          ? values.website
+          : undefined,
+      github:
+        values.github && values.github.length > 0
+          ? `https://github.com/${values.github}`
+          : undefined,
+      linkedin:
+        values.linkedin && values.linkedin.length > 0
+          ? `https://linkedin.com/in/${values.linkedin}`
+          : undefined,
+      dribble:
+        values.dribble && values.dribble.length > 0
+          ? `https://dribbble.com/${values.dribble}`
+          : undefined,
+    },
     onError(err) {
       if (err.graphQLErrors[0]) {
         if (err.graphQLErrors[0].message === 'Argument Validation Error') {
@@ -79,22 +123,24 @@ export const CreateProfileForm = props => {
   };
 
   const onSubmit = e => {
-    if (values.github) values.github = `github.com/${values.github}`;
-    if (values.linkedin) values.linkedin = `linkedin.com/in/${values.linkedin}`;
-    if (values.dribble) values.dribble = `dribbble.com/${values.dribble}`;
     e.preventDefault();
-    createProfile();
+    setProfile();
   };
 
   return (
     <chakra.form onSubmit={onSubmit} {...props}>
       <Stack spacing="6">
         <Heading textAlign="center" size="xl" fontWeight="extrabold">
-          Create Profile
+          {formTitle ? formTitle : 'Create Profile'}
         </Heading>
         <FormControl id="skills" isRequired>
           <FormLabel>Skills</FormLabel>
           <MultiSelect
+            {...(values.skills.length > 0 && {
+              defaultValue: skillsList.filter(skill =>
+                values.skills.includes(skill.label)
+              ),
+            })}
             name="skills"
             options={skillsList}
             isMulti
@@ -162,44 +208,9 @@ export const CreateProfileForm = props => {
           loadingText="Submitting"
           spinnerPlacement="end"
         >
-          Register
+          {buttonText ? buttonText : 'Register'}
         </Button>
       </Stack>
     </chakra.form>
   );
 };
-
-const CREATE_PROFILE = gql`
-  mutation setProfile(
-    $name: String
-    $bio: String
-    $location: String
-    $skills: [String!]!
-    $website: String
-    $github: String
-    $linkedIn: String
-    $dribble: String
-  ) {
-    setProfile(
-      input: {
-        name: $name
-        bio: $bio
-        location: $location
-        skills: $skills
-        links: {
-          website: $website
-          github: $github
-          linkedin: $linkedIn
-          dribble: $dribble
-        }
-      }
-    ) {
-      profile {
-        skills
-        activeProject {
-          title
-        }
-      }
-    }
-  }
-`;
