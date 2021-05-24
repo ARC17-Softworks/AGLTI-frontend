@@ -55,6 +55,7 @@ export const SearchPositions = props => {
   const [skills, setSkills] = useState([...context.profile.skills]);
   const [page, setPage] = useState(1);
   const [buttonState, setButtonState] = useState([false, false]);
+  const [applyId, setApplyId] = useState('');
 
   const { data, loading, refetch, networkStatus, error } = useQuery(
     SEARCH_POSITIONS,
@@ -190,11 +191,12 @@ export const SearchPositions = props => {
                 <Spacer />
                 <Button
                   colorScheme="green"
-                  isLoading={applyLoading}
+                  isLoading={applyId === position.id && applyLoading}
                   loadingText="Applying..."
                   spinnerPlacement="end"
                   mr={3}
                   onClick={() => {
+                    setApplyId(position.id);
                     apply({ variables: { positionId: position.id } });
                   }}
                 >
@@ -340,11 +342,12 @@ export const SearchPositions = props => {
                 <ModalFooter>
                   <Button
                     colorScheme="green"
-                    isLoading={applyLoading}
+                    isLoading={applyId === modalValues.id && applyLoading}
                     loadingText="Applying..."
                     spinnerPlacement="end"
                     mr={3}
                     onClick={() => {
+                      setApplyId(modalValues.id);
                       apply({ variables: { positionId: modalValues.id } });
                       onClose();
                     }}
