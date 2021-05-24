@@ -64,9 +64,7 @@ const AuthProvider = props => {
     if (data.checkAuth.profile) {
       initialState.profile = {
         skills: data.checkAuth.profile.skills,
-        activeProject: data.checkAuth.profile.activeProject
-          ? data.checkAuth.profile.activeProject.title
-          : data.checkAuth.profile.activeProject,
+        activeProject: data.checkAuth.profile.activeProject ? true : false,
       };
     }
   }

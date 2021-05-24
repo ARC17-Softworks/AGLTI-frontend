@@ -13,6 +13,8 @@ import { Dashboard } from './pages/LogedIn/Dashboard';
 import { AuthProvider } from './context/auth';
 import { CreateProfile } from './pages/LogedIn/CreateProfile';
 import { ChangePassword } from './pages/LogedIn/ChangePassword';
+import { Profile } from './pages/LogedIn/Profile';
+import { SearchPositions } from './pages/LogedIn/SearchPositions';
 
 function App() {
   return (
@@ -28,7 +30,7 @@ function App() {
               path="/resetpassword"
               component={ResetPassword}
             />
-            <AuthenticatedRoute exact path="/dashboard" component={Dashboard} />
+            <AuthenticatedRoute path="/dashboard" component={Dashboard} />
             <AuthenticatedRoute
               exact
               path="/createprofile"
@@ -38,6 +40,16 @@ function App() {
               exact
               path="/user/changepassword"
               component={ChangePassword}
+            />
+            <AuthenticatedRoute
+              exact
+              path="/user/:userId"
+              component={Profile}
+            />
+            <AuthenticatedRoute
+              exact
+              path="/position/search"
+              component={SearchPositions}
             />
             <Route>
               <NotFound />

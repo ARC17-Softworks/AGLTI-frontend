@@ -39,7 +39,7 @@ export const DashboardSideNav = () => {
         size="sm"
         w="full"
         as={RouterLink}
-        to="/search"
+        to="/position/search"
       >
         Search Positions
       </Button>
@@ -52,7 +52,7 @@ export const DashboardSideNav = () => {
         size="sm"
         w="full"
         as={RouterLink}
-        to="/project"
+        to="/createproject"
       >
         Create Project
       </Button>

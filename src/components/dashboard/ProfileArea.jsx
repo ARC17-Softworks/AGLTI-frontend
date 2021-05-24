@@ -23,6 +23,8 @@ import {
   Heading,
   Box,
   useToast,
+  Wrap,
+  WrapItem,
 } from '@chakra-ui/react';
 import {
   EditIcon,
@@ -48,9 +50,9 @@ import {
 import { DASHBOARD_QUERY, GET_GITHUB_REPOS } from '../../graphql';
 import { Loading } from '../Loading';
 import { DashboardContext } from '../../context/dashboard';
-import { SetProfileForm } from '../profile/SetProfileForm';
-import { AddExperienceForm } from '../profile/AddExperienceForm';
-import { AddEducationForm } from '../profile/AddEducationForm';
+import { SetProfileForm } from './SetProfileForm';
+import { AddExperienceForm } from './AddExperienceForm';
+import { AddEducationForm } from './AddEducationForm';
 
 export const ProfileArea = () => {
   const authContext = useContext(AuthContext);
@@ -157,18 +159,18 @@ export const ProfileArea = () => {
   const profile = data ? data.getMe.profile : null;
   const offers = profile ? profile.offers : [];
   useEffect(() => {
-    if (offers) {
+    if (profile && !profile.activeProject && offers) {
       const unreadOffers = offers.map(offer => offer.read === false).length;
 
       setOffers(unreadOffers);
     }
     //eslint-disable-next-line
-  }, [offers]);
+  }, [offers, profile]);
 
   useEffect(() => {
     async function fetchData() {
       if (!(loading || networkStatus === NetworkStatus.refetch)) {
-        if (data.getMe.profile.links.github) {
+        if (data.getMe.profile.links && data.getMe.profile.links.github) {
           const username = data.getMe.profile.links.github.split(
             'https://github.com/'
           )[1];
@@ -221,18 +223,26 @@ export const ProfileArea = () => {
                     skills: profile.skills,
                     location: profile.location ? profile.location : '',
                     bio: profile.bio ? profile.bio : '',
-                    website: profile.links.website ? profile.links.website : '',
-                    github: profile.links.github
-                      ? profile.links.github.split('https://github.com/')[1]
-                      : '',
-                    linkedin: profile.links.linkedin
-                      ? profile.links.linkedin.split(
-                          'https://linkedin.com/in/'
-                        )[1]
-                      : '',
-                    dribble: profile.links.dribble
-                      ? profile.links.dribble.split('https://dribbble.com/')[1]
-                      : '',
+                    website:
+                      profile.links && profile.links.website
+                        ? profile.links.website
+                        : '',
+                    github:
+                      profile.links && profile.links.github
+                        ? profile.links.github.split('https://github.com/')[1]
+                        : '',
+                    linkedin:
+                      profile.links && profile.links.linkedin
+                        ? profile.links.linkedin.split(
+                            'https://linkedin.com/in/'
+                          )[1]
+                        : '',
+                    dribble:
+                      profile.links && profile.links.dribble
+                        ? profile.links.dribble.split(
+                            'https://dribbble.com/'
+                          )[1]
+                        : '',
                   }}
                   refetch={refetch}
                   onClose={onClose}
@@ -241,11 +251,13 @@ export const ProfileArea = () => {
             </ModalContent>
           </Modal>
         </Flex>
-        <HStack>
+        <Wrap>
           {profile.skills.map(skill => (
-            <Badge key={skill}>{skill}</Badge>
+            <WrapItem key={skill}>
+              <Badge>{skill}</Badge>
+            </WrapItem>
           ))}
-        </HStack>
+        </Wrap>
         {profile.location && (
           <Text>
             <Icon as={MapPin} weight="fill" /> {profile.location}{' '}
@@ -257,24 +269,24 @@ export const ProfileArea = () => {
             val => val && val.length > 0 && val !== 'Links'
           ) && (
             <HStack spacing={3}>
-              {profile.links.website && (
+              {profile.links && profile.links.website && (
                 <Link href={profile.links.website} isExternal>
                   <Icon as={Globe} /> Website/Blog <ExternalLinkIcon mx="2px" />
                 </Link>
               )}
-              {profile.links.github && (
+              {profile.links && profile.links.github && (
                 <Link href={profile.links.github} isExternal>
                   <Icon as={GithubLogo} weight="fill" /> GitHub{' '}
                   <ExternalLinkIcon mx="2px" />
                 </Link>
               )}
-              {profile.links.linkedin && (
+              {profile.links && profile.links.linkedin && (
                 <Link href={profile.links.linkedin} isExternal>
                   <Icon as={LinkedinLogo} weight="fill" /> LinkedIn{' '}
                   <ExternalLinkIcon mx="2px" />
                 </Link>
               )}
-              {profile.links.dribble && (
+              {profile.links && profile.links.dribble && (
                 <Link href={profile.links.dribble} isExternal>
                   <Icon as={DribbbleLogo} weight="fill" /> Dribbble{' '}
                   <ExternalLinkIcon mx="2px" />
@@ -447,7 +459,9 @@ export const ProfileArea = () => {
                 key={repo.url}
               >
                 <Heading size="md" my="2">
-                  <LinkOverlay href={repo.url}>{repo.name}</LinkOverlay>
+                  <LinkOverlay isExternal href={repo.url}>
+                    {repo.name}
+                  </LinkOverlay>
                 </Heading>
                 {repo.primaryLanguage && (
                   <Badge>{repo.primaryLanguage.name}</Badge>
