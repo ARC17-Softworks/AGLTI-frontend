@@ -56,11 +56,60 @@ export const SearchPositions = props => {
   const [page, setPage] = useState(1);
   const [buttonState, setButtonState] = useState([false, false]);
 
-  const { data, loading, refetch, networkStatus } = useQuery(SEARCH_POSITIONS, {
-    variables: { qskills: skills, page },
-    skip: !context.profile.skills || context.profile.skills.length === 0,
-    fetchPolicy: 'no-cache',
+  const { data, loading, refetch, networkStatus, error } = useQuery(
+    SEARCH_POSITIONS,
+    {
+      variables: { qskills: skills, page },
+      skip: !context.profile.skills || context.profile.skills.length === 0,
+      fetchPolicy: 'no-cache',
+    }
+  );
+
+  const [apply, { loading: applyLoading }] = useMutation(APPLY, {
+    update(proxy, result) {
+      toast({
+        title: 'Applied',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+        position: 'bottom-left',
+      });
+      refetch();
+    },
+    onError(err) {
+      if (err.graphQLErrors[0]) {
+        if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+          toast({
+            title: Object.values(
+              err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                .constraints
+            )[0],
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        } else {
+          toast({
+            title: err.graphQLErrors[0].message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      } else {
+        toast({
+          title: err.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'bottom-left',
+        });
+      }
+    },
   });
+
   const toast = useToast();
 
   const positions =
@@ -85,7 +134,9 @@ export const SearchPositions = props => {
 
   useEffect(() => {
     if (pagination && !loading && networkStatus !== NetworkStatus.refetch) {
-      if (page === 1 && page === pagination.pages) {
+      if (pagination.pages === 0) {
+        setButtonState([false, false]);
+      } else if (page === 1 && page === pagination.pages) {
         setButtonState([false, false]);
       } else if (page === pagination.pages) {
         setButtonState([true, false]);
@@ -121,15 +172,35 @@ export const SearchPositions = props => {
             rounded="md"
           >
             <Heading size="md" my="2">
-              <LinkOverlay
-                href="#"
-                onClick={() => {
-                  setModalValues(position);
-                  onOpen();
-                }}
+              <Flex
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
               >
-                {position.title}
-              </LinkOverlay>
+                <LinkOverlay
+                  href="#"
+                  onClick={() => {
+                    setModalValues(position);
+                    onOpen();
+                  }}
+                  fontSize="2xl"
+                >
+                  {position.title}
+                </LinkOverlay>
+                <Spacer />
+                <Button
+                  colorScheme="green"
+                  isLoading={applyLoading}
+                  loadingText="Applying..."
+                  spinnerPlacement="end"
+                  mr={3}
+                  onClick={() => {
+                    apply({ variables: { positionId: position.id } });
+                  }}
+                >
+                  Apply
+                </Button>
+              </Flex>
             </Heading>
             <Wrap>
               {position.skills.map(skill => (
@@ -151,6 +222,16 @@ export const SearchPositions = props => {
       )}
     </VStack>
   );
+
+  if (error) {
+    toast({
+      title: error.message,
+      status: 'error',
+      duration: 3000,
+      isClosable: true,
+      position: 'bottom-left',
+    });
+  }
 
   if (!context.profile.skills || context.profile.skills.length === 0) {
     return <Redirect to="/dashboard" />;
@@ -202,7 +283,7 @@ export const SearchPositions = props => {
                 </Text>
                 <Spacer />
                 <Text color="gray.500" fontSize="md">
-                  page {page} of {pagination.total}
+                  page {page} of {pagination.pages}
                 </Text>
               </Flex>
             )}
@@ -257,7 +338,17 @@ export const SearchPositions = props => {
                 </ModalBody>
 
                 <ModalFooter>
-                  <Button colorScheme="green" mr={3} onClick={onClose}>
+                  <Button
+                    colorScheme="green"
+                    isLoading={applyLoading}
+                    loadingText="Applying..."
+                    spinnerPlacement="end"
+                    mr={3}
+                    onClick={() => {
+                      apply({ variables: { positionId: modalValues.id } });
+                      onClose();
+                    }}
+                  >
                     Apply
                   </Button>
                 </ModalFooter>
@@ -314,5 +405,11 @@ const SEARCH_POSITIONS = gql`
         count
       }
     }
+  }
+`;
+
+const APPLY = gql`
+  mutation apply($positionId: String!) {
+    apply(positionId: $positionId)
   }
 `;

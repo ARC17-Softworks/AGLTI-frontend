@@ -31,7 +31,7 @@ export const SignedInNav = () => {
   const [logoutUser] = useMutation(LOGOUT_USER, {
     update() {
       context.logout();
-      client.resetStore();
+      client.clearStore();
     },
     onError(err) {
       if (err.graphQLErrors) {
@@ -55,6 +55,14 @@ export const SignedInNav = () => {
             position: 'bottom-left',
           });
         }
+      } else {
+        toast({
+          title: err.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'bottom-left',
+        });
       }
     },
   });

@@ -26,7 +26,7 @@ export const AuthenticatedRoute = props => {
   }
 
   if (!context.user) {
-    client.resetStore();
+    client.clearStore();
     return <Redirect to="/" />;
   }
   return <Route {...props} />;
