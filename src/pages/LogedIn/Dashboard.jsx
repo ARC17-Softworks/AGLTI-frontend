@@ -10,6 +10,8 @@ import { DashboardSideNav } from '../../components/layout/DashboardSideNav';
 import { AuthContext } from '../../context/auth';
 import { DashboardProvider } from '../../context/dashboard';
 import { ProfileArea } from '../../components/dashboard/ProfileArea';
+import { AppliedArea } from '../../components/dashboard/AppliedArea';
+import { OffersArea } from '../../components/dashboard/OffersArea';
 
 export const Dashboard = () => {
   const context = useContext(AuthContext);
@@ -31,6 +33,12 @@ export const Dashboard = () => {
               <Switch>
                 <Route exact path={path}>
                   <ProfileArea />
+                </Route>
+                <Route exact path={`${path}/applied`}>
+                  <AppliedArea />
+                </Route>
+                <Route exact path={`${path}/offers`}>
+                  <OffersArea />
                 </Route>
               </Switch>
             </Box>

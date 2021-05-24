@@ -45,7 +45,7 @@ export const Profile = props => {
 
   useEffect(() => {
     async function fetchData() {
-      if (!loading) {
+      if (!loading && !error) {
         if (
           data.getProfile.profile.links &&
           data.getProfile.profile.links.github
@@ -65,7 +65,7 @@ export const Profile = props => {
       }
     }
     fetchData();
-  }, [client, data, loading]);
+  }, [client, data, loading, error]);
 
   if (loading) {
     return <Loading />;
@@ -83,8 +83,8 @@ export const Profile = props => {
           <Text fontSize="5xl">{profile.user.name}</Text>
           <Wrap>
             {profile.skills.map(skill => (
-              <WrapItem>
-                <Badge key={skill}>{skill}</Badge>
+              <WrapItem key={skill}>
+                <Badge>{skill}</Badge>
               </WrapItem>
             ))}
           </Wrap>
@@ -125,10 +125,11 @@ export const Profile = props => {
                 )}
               </HStack>
             )}
-          <Text fontSize="4xl">Expierience</Text>
-          <Divider />
+
           {profile.experience.length > 0 && (
             <>
+              <Text fontSize="4xl">Expierience</Text>
+              <Divider />
               {profile.experience.map(experience => (
                 <Box
                   w="full"
@@ -168,11 +169,10 @@ export const Profile = props => {
               ))}
             </>
           )}
-          <Text fontSize="4xl">Education</Text>
-
-          <Divider />
           {profile.education.length > 0 && (
             <>
+              <Text fontSize="4xl">Education</Text>
+              <Divider />
               {profile.education.map(education => (
                 <Box
                   w="full"

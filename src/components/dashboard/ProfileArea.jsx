@@ -253,8 +253,8 @@ export const ProfileArea = () => {
         </Flex>
         <Wrap>
           {profile.skills.map(skill => (
-            <WrapItem>
-              <Badge key={skill}>{skill}</Badge>
+            <WrapItem key={skill}>
+              <Badge>{skill}</Badge>
             </WrapItem>
           ))}
         </Wrap>
