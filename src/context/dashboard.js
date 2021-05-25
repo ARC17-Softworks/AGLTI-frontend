@@ -1,4 +1,4 @@
-import React, { useReducer, createContext } from 'react';
+import React, { useReducer, createContext, useCallback } from 'react';
 
 const initialState = { offers: 0 };
 
@@ -19,9 +19,9 @@ const dashboardReducer = (state, action) => {
 const DashboardProvider = props => {
   const [state, dispatch] = useReducer(dashboardReducer, initialState);
 
-  const setOffers = data => {
+  const setOffers = useCallback(data => {
     dispatch({ type: 'SET_OFFERS', payload: data });
-  };
+  }, []);
 
   return (
     <DashboardContext.Provider

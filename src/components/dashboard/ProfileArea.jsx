@@ -157,15 +157,15 @@ export const ProfileArea = () => {
   });
 
   const profile = data ? data.getMe.profile : null;
-  const offers = profile ? profile.offers : [];
-  useEffect(() => {
-    if (profile && !profile.activeProject && offers) {
-      const unreadOffers = offers.map(offer => offer.read === false).length;
 
+  useEffect(() => {
+    if (profile && !profile.activeProject && profile.offers.length > 0) {
+      const unreadOffers = profile.offers.map(
+        offer => offer.read === false
+      ).length;
       setOffers(unreadOffers);
     }
-    //eslint-disable-next-line
-  }, [offers, profile]);
+  }, [profile, setOffers]);
 
   useEffect(() => {
     async function fetchData() {
