@@ -30,8 +30,12 @@ export const ResetPassword = props => {
           ? {
               skills: result.data.resetPassword.profile.skills,
               activeProject: result.data.resetPassword.profile.activeProject
-                ? result.data.resetPassword.profile.activeProject.title
-                : result.data.resetPassword.profile.activeProject,
+                ? true
+                : false,
+              projectOwner:
+                result.data.resetPassword.profile.activeProject &&
+                result.data.resetPassword.profile.activeProject.owner.id ===
+                  result.data.resetPassword.user.id,
             }
           : null,
       });
@@ -175,6 +179,9 @@ const RESET_PASSWORD = gql`
         skills
         activeProject {
           title
+          owner {
+            id
+          }
         }
       }
     }

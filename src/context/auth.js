@@ -65,6 +65,10 @@ const AuthProvider = props => {
       initialState.profile = {
         skills: data.checkAuth.profile.skills,
         activeProject: data.checkAuth.profile.activeProject ? true : false,
+        projectOwner:
+          data.checkAuth.profile.activeProject &&
+          data.checkAuth.profile.activeProject.owner.id ===
+            data.checkAuth.user.id,
       };
     }
   }
@@ -111,6 +115,9 @@ const CHECK_AUTH = gql`
         skills
         activeProject {
           title
+          owner {
+            id
+          }
         }
       }
     }

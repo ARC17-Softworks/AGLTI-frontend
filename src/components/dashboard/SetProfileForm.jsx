@@ -47,8 +47,12 @@ export const SetProfileForm = ({
       context.setProfile({
         skills: result.data.setProfile.profile.skills,
         activeProject: result.data.setProfile.profile.activeProject
-          ? result.data.setProfile.profile.activeProject.title
-          : result.data.setProfile.profile.activeProject,
+          ? true
+          : false,
+        projectOwner:
+          result.data.setProfile.profile.activeProject &&
+          result.data.setProfile.profile.activeProject.owner.id ===
+            context.user.id,
       });
       if (refetch && onClose) {
         refetch();

@@ -29,6 +29,9 @@ export const SET_PROFILE = gql`
         skills
         activeProject {
           title
+          owner {
+            id
+          }
         }
       }
     }
