@@ -45,7 +45,6 @@ const AuthProvider = props => {
   });
 
   initialState.load = loading;
-  // console.log(initialState.load);
 
   if (!userPopulated && data) {
     if (data.checkAuth.user) {

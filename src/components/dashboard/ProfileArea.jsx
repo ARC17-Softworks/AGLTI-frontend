@@ -83,7 +83,6 @@ export const ProfileArea = () => {
       refetch();
     },
     onError(err) {
-      console.log(err.networkError.result);
       if (err.graphQLErrors[0]) {
         if (err.graphQLErrors[0].message === 'Argument Validation Error') {
           toast({
@@ -122,7 +121,6 @@ export const ProfileArea = () => {
       refetch();
     },
     onError(err) {
-      console.log(err.networkError.result);
       if (err.graphQLErrors[0]) {
         if (err.graphQLErrors[0].message === 'Argument Validation Error') {
           toast({

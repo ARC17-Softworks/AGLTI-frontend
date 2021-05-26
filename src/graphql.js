@@ -83,7 +83,13 @@ export const DASHBOARD_QUERY = gql`
           position {
             id
             title
+            description
+            date
             skills
+            project {
+              id
+              title
+            }
           }
           read
         }
@@ -91,7 +97,13 @@ export const DASHBOARD_QUERY = gql`
           position {
             id
             title
+            description
+            date
             skills
+            project {
+              id
+              title
+            }
           }
         }
         contacts {
