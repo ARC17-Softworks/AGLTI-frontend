@@ -104,7 +104,7 @@ export const AppliedArea = () => {
 
   useEffect(() => {
     if (profile && !profile.activeProject && profile.offers.length > 0) {
-      const unreadOffers = profile.offers.map(
+      const unreadOffers = profile.offers.filter(
         offer => offer.read === false
       ).length;
       setOffers(unreadOffers);

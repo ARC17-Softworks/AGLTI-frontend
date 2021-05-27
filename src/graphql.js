@@ -182,3 +182,9 @@ export const GET_GITHUB_REPOS = gql`
     }
   }
 `;
+
+export const MARK_READ = gql`
+  mutation markRead($path: String!) {
+    markRead(path: $path)
+  }
+`;

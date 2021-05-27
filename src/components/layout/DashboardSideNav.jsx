@@ -25,7 +25,7 @@ export const DashboardSideNav = () => {
       colorScheme="blue"
       size="sm"
       as={RouterLink}
-      to="/project"
+      to="/projectdashboard"
     >
       Go To Project
     </Button>
