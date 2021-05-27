@@ -239,7 +239,7 @@ export const SearchPositions = props => {
     return <Redirect to="/dashboard" />;
   }
   if (context.profile.activeProject) {
-    return <Redirect to="/dashboard" />;
+    return <Redirect to="/projectdashboard" />;
   }
   return (
     <Box>

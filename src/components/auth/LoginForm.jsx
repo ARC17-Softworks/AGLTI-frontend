@@ -45,8 +45,12 @@ export const LoginForm = props => {
           ? {
               skills: result.data.login.profile.skills,
               activeProject: result.data.login.profile.activeProject
-                ? result.data.login.profile.activeProject.title
-                : result.data.login.profile.activeProject,
+                ? true
+                : false,
+              projectOwner:
+                result.data.login.profile.activeProject &&
+                result.data.login.profile.activeProject.owner.id ===
+                  result.data.login.user.id,
             }
           : null,
       });
@@ -224,6 +228,9 @@ const LOGIN_USER = gql`
         skills
         activeProject {
           title
+          owner {
+            id
+          }
         }
       }
     }

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Grid, GridItem, Box } from '@chakra-ui/react';
 import {
   Redirect,
@@ -17,8 +17,14 @@ export const Dashboard = () => {
   const context = useContext(AuthContext);
   const { path } = useRouteMatch();
 
+  const [projectEnrolled, setProjectEnrolled] = useState(false);
+
   if (!context.profile) {
     return <Redirect to="/createprofile" />;
+  }
+
+  if (projectEnrolled) {
+    return <Redirect to="/projectdashboard" />;
   }
 
   return (
@@ -38,7 +44,7 @@ export const Dashboard = () => {
                   <AppliedArea />
                 </Route>
                 <Route exact path={`${path}/offers`}>
-                  <OffersArea />
+                  <OffersArea setProjectEnrolled={setProjectEnrolled} />
                 </Route>
               </Switch>
             </Box>

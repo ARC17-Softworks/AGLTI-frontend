@@ -29,6 +29,9 @@ export const SET_PROFILE = gql`
         skills
         activeProject {
           title
+          owner {
+            id
+          }
         }
       }
     }
@@ -80,7 +83,13 @@ export const DASHBOARD_QUERY = gql`
           position {
             id
             title
+            description
+            date
             skills
+            project {
+              id
+              title
+            }
           }
           read
         }
@@ -88,7 +97,13 @@ export const DASHBOARD_QUERY = gql`
           position {
             id
             title
+            description
+            date
             skills
+            project {
+              id
+              title
+            }
           }
         }
         contacts {
@@ -165,5 +180,11 @@ export const GET_GITHUB_REPOS = gql`
         }
       }
     }
+  }
+`;
+
+export const MARK_READ = gql`
+  mutation markRead($path: String!) {
+    markRead(path: $path)
   }
 `;

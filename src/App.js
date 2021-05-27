@@ -15,6 +15,8 @@ import { CreateProfile } from './pages/LogedIn/CreateProfile';
 import { ChangePassword } from './pages/LogedIn/ChangePassword';
 import { Profile } from './pages/LogedIn/Profile';
 import { SearchPositions } from './pages/LogedIn/SearchPositions';
+import { Project } from './pages/LogedIn/Project';
+import { ProjectDashboard } from './pages/LogedIn/ProjectDashboard';
 
 function App() {
   return (
@@ -29,6 +31,10 @@ function App() {
               exact
               path="/resetpassword"
               component={ResetPassword}
+            />
+            <AuthenticatedRoute
+              path="/projectdashboard"
+              component={ProjectDashboard}
             />
             <AuthenticatedRoute path="/dashboard" component={Dashboard} />
             <AuthenticatedRoute
@@ -45,6 +51,11 @@ function App() {
               exact
               path="/user/:userId"
               component={Profile}
+            />
+            <AuthenticatedRoute
+              exact
+              path="/project/:projectId"
+              component={Project}
             />
             <AuthenticatedRoute
               exact
