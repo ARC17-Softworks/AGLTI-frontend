@@ -52,6 +52,11 @@ export const DASHBOARD_QUERY = gql`
         location
         skills
         projects {
+          proj {
+            id
+            title
+          }
+          skills
           title
         }
         experience {

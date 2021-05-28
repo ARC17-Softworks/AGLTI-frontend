@@ -26,6 +26,7 @@ import {
   Wrap,
   WrapItem,
 } from '@chakra-ui/react';
+import { Link as RouterLink } from 'react-router-dom';
 import {
   EditIcon,
   ExternalLinkIcon,
@@ -443,6 +444,45 @@ export const ProfileArea = () => {
               </Box>
             ))}
           </>
+        )}
+        <Text fontSize="4xl">Projects</Text>
+        <Divider />
+        {profile.projects.length > 0 && (
+          <HStack>
+            {profile.projects.map(project => (
+              <LinkBox
+                w="full"
+                p="3"
+                borderWidth="1px"
+                rounded="md"
+                key={project.proj.id}
+              >
+                {' '}
+                <VStack>
+                  <Heading size="md" my="2">
+                    <LinkOverlay
+                      isExternal
+                      as={RouterLink}
+                      to={`/project/${project.proj.id}`}
+                    >
+                      {project.proj.title}
+                    </LinkOverlay>
+                  </Heading>
+                  <Divider />
+                  <Text fontWeight="bold">{project.title}</Text>
+                  {project.skills.length > 0 && (
+                    <Wrap>
+                      {project.skills.map(skill => (
+                        <WrapItem key={skill}>
+                          <Badge>{skill}</Badge>
+                        </WrapItem>
+                      ))}
+                    </Wrap>
+                  )}
+                </VStack>
+              </LinkBox>
+            ))}
+          </HStack>
         )}
         {githubRepos.length > 0 && (
           <>
