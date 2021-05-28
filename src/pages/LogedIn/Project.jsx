@@ -9,6 +9,7 @@ import {
   WrapItem,
   Link,
   Avatar,
+  Badge,
 } from '@chakra-ui/react';
 import { useQuery, gql } from '@apollo/client';
 import { Link as RouterLink } from 'react-router-dom';
@@ -42,14 +43,20 @@ export const Project = props => {
       <VStack mt={4} alignItems="start" w="full" justify="center">
         <Box w="full" p={'6'} borderWidth="1px" rounded="md">
           <Heading as="h1" size="2xl">
-            {project.title}
+            {project.title}{' '}
+            {project.closed ? (
+              <Badge colorScheme="red">Closed</Badge>
+            ) : (
+              <Badge colorScheme="green">Open</Badge>
+            )}
           </Heading>
-          <Divider />
+
           <Text mt={6} py={2} fontSize="xl" fontWeight="black">
             description:
           </Text>
           <Text fontStyle="italic">"{project.description}"</Text>
-          <VStack mt={1} alignItems="end" w="full" justify="center">
+          <Divider py={3} />
+          <VStack pt={1} alignItems="start" w="full" justify="center">
             <VStack alignItems="start">
               <Text fontStyle="italic" fontWeight="bold">
                 created by:
@@ -62,8 +69,16 @@ export const Project = props => {
                 >
                   <Avatar size="xl" src={project.owner.avatar} mb={1} />
                 </Link>
-                <Text fontSize="md">{project.owner.name}</Text>
               </VStack>
+              <Text fontSize="md">{project.owner.name}</Text>
+              <Text fontSize="sm">
+                created on{' '}
+                {
+                  new Date(project.createdAt)
+                    .toLocaleString('en-GB')
+                    .split(',')[0]
+                }
+              </Text>
             </VStack>
           </VStack>
         </Box>
@@ -112,6 +127,7 @@ const GET_PROJECT = gql`
           name
           avatar
         }
+        closed
         title
         description
         members {
@@ -132,6 +148,7 @@ const GET_PROJECT = gql`
           title
           skills
         }
+        createdAt
       }
     }
   }

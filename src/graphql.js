@@ -188,3 +188,86 @@ export const MARK_READ = gql`
     markRead(path: $path)
   }
 `;
+
+export const PROJECT_DASHBOARD_QUERY = gql`
+  query currentProject {
+    currentProject {
+      project {
+        id
+        owner {
+          id
+          name
+          avatar
+        }
+        title
+        description
+        closed
+        openings {
+          position {
+            id
+            title
+            description
+            skills
+            date
+          }
+        }
+        applicants {
+          dev {
+            id
+            name
+            avatar
+          }
+          position {
+            id
+          }
+          read
+        }
+        offered {
+          dev {
+            id
+            name
+            avatar
+          }
+          position {
+            id
+          }
+        }
+        members {
+          dev {
+            id
+            name
+            avatar
+          }
+          title
+          skills
+        }
+        previousMembers {
+          dev {
+            id
+            name
+            avatar
+          }
+          title
+          skills
+        }
+        taskColumns
+        tasks {
+          id
+          dev {
+            id
+            name
+            avatar
+          }
+          title
+          description
+          note
+          status
+          startDate
+          dueDate
+          read
+        }
+        createdAt
+      }
+    }
+  }
+`;
