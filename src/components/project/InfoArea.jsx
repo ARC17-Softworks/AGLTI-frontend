@@ -55,18 +55,18 @@ export const InfoArea = props => {
 
   const toast = useToast();
 
-  const { data, loading, refetch, networkStatus } = useQuery(
+  const { data, loading, refetch, networkStatus, error } = useQuery(
     PROJECT_DASHBOARD_QUERY,
     {
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: 'no-cache',
     }
   );
 
   const project = data ? data.currentProject.project : null;
 
   const [values, setValues] = useState({
-    title: project.title || '',
-    description: project.description || '',
+    title: (project && project.title) || '',
+    description: (project && project.description) || '',
   });
 
   const [closeProject, { loading: closeLoading }] = useMutation(CLOSE_PROJECT, {
@@ -183,6 +183,16 @@ export const InfoArea = props => {
     onEditClose();
   };
 
+  if (error && error.message === 'Not authorised to access this resource') {
+    authContext.setProfile({
+      ...authContext.profile,
+      activeProject: false,
+      projectOwner: false,
+    });
+
+    return <Loading />;
+  }
+
   if (loading || networkStatus === NetworkStatus.refetch) {
     return <Loading />;
   }
@@ -216,7 +226,7 @@ export const InfoArea = props => {
               <chakra.form onSubmit={onSubmit} {...props}>
                 <Stack spacing="6">
                   <Heading textAlign="center" size="xl" fontWeight="extrabold">
-                    Create Project
+                    Update Project
                   </Heading>
                   <FormControl id="title">
                     <FormLabel>Title</FormLabel>

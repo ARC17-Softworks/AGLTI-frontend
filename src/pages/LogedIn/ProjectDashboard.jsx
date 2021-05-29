@@ -11,6 +11,7 @@ import { ProjectDashboardProvider } from '../../context/projectDashboard';
 import { AuthContext } from '../../context/auth';
 import { InfoArea } from '../../components/project/InfoArea';
 import { OpeningsArea } from '../../components/project/OpeningsArea';
+import { MemberArea } from '../../components/project/MemberArea';
 
 export const ProjectDashboard = () => {
   const context = useContext(AuthContext);
@@ -39,6 +40,9 @@ export const ProjectDashboard = () => {
                 </Route>
                 <Route exact path={`${path}/openings`}>
                   <OpeningsArea />
+                </Route>
+                <Route exact path={`${path}/members`}>
+                  <MemberArea />
                 </Route>
               </Switch>
             </Box>
