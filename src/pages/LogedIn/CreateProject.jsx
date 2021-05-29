@@ -15,7 +15,7 @@ import React, { useState, useContext } from 'react';
 import { useMutation, gql } from '@apollo/client';
 import { AuthContext } from '../../context/auth';
 
-export const CreateProject = props => {
+export const CreateProject = ({ staticContext, ...props }) => {
   const context = useContext(AuthContext);
   const [values, setValues] = useState({
     title: '',
