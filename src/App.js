@@ -13,6 +13,7 @@ import { Dashboard } from './pages/LogedIn/Dashboard';
 import { AuthProvider } from './context/auth';
 import { CreateProfile } from './pages/LogedIn/CreateProfile';
 import { ChangePassword } from './pages/LogedIn/ChangePassword';
+import { CreateProject } from './pages/LogedIn/CreateProject';
 import { Profile } from './pages/LogedIn/Profile';
 import { SearchPositions } from './pages/LogedIn/SearchPositions';
 import { Project } from './pages/LogedIn/Project';
@@ -41,6 +42,11 @@ function App() {
               exact
               path="/createprofile"
               component={CreateProfile}
+            />
+            <AuthenticatedRoute
+              exact
+              path="/createproject"
+              component={CreateProject}
             />
             <AuthenticatedRoute
               exact

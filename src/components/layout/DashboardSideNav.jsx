@@ -63,6 +63,7 @@ export const DashboardSideNav = () => {
     <>
       <Button
         variant="ghost"
+        justifyContent="start"
         leftIcon={<PaperPlaneTilt weight="fill" />}
         size="md"
         as={RouterLink}
@@ -73,6 +74,7 @@ export const DashboardSideNav = () => {
       </Button>
       <Button
         variant="ghost"
+        justifyContent="start"
         leftIcon={<ArchiveTray weight="fill" />}
         size="md"
         as={RouterLink}
@@ -111,6 +113,7 @@ export const DashboardSideNav = () => {
           {!authContext.profile.activeProject && appliedAndOffers}
           {/* <Button
             variant="ghost"
+            justifyContent="start"
             leftIcon={<Users weight="fill" />}
             size="md"
             // as={RouterLink}
@@ -121,6 +124,7 @@ export const DashboardSideNav = () => {
           </Button>
           <Button
             variant="ghost"
+            justifyContent="start"
             leftIcon={<Chats weight="fill" />}
             size="md"
             // as={RouterLink}

@@ -52,6 +52,11 @@ export const DASHBOARD_QUERY = gql`
         location
         skills
         projects {
+          proj {
+            id
+            title
+          }
+          skills
           title
         }
         experience {
@@ -186,5 +191,88 @@ export const GET_GITHUB_REPOS = gql`
 export const MARK_READ = gql`
   mutation markRead($path: String!) {
     markRead(path: $path)
+  }
+`;
+
+export const PROJECT_DASHBOARD_QUERY = gql`
+  query currentProject {
+    currentProject {
+      project {
+        id
+        owner {
+          id
+          name
+          avatar
+        }
+        title
+        description
+        closed
+        openings {
+          position {
+            id
+            title
+            description
+            skills
+            date
+          }
+        }
+        applicants {
+          dev {
+            id
+            name
+            avatar
+          }
+          position {
+            id
+          }
+          read
+        }
+        offered {
+          dev {
+            id
+            name
+            avatar
+          }
+          position {
+            id
+          }
+        }
+        members {
+          dev {
+            id
+            name
+            avatar
+          }
+          title
+          skills
+        }
+        previousMembers {
+          dev {
+            id
+            name
+            avatar
+          }
+          title
+          skills
+        }
+        taskColumns
+        tasks {
+          id
+          dev {
+            id
+            name
+            avatar
+          }
+          title
+          description
+          note
+          status
+          startDate
+          dueDate
+          read
+        }
+        createdAt
+      }
+    }
   }
 `;
