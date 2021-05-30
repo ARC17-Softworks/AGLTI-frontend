@@ -542,7 +542,7 @@ export const OpeningsArea = () => {
                         variant="outline"
                         w="full"
                         as={RouterLink}
-                        to={`/developer/search/${modalValues.id}`}
+                        to={`/developer/search/${opening.position.id}`}
                       >
                         Search for Developer
                       </Button>

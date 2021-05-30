@@ -18,6 +18,7 @@ import { Profile } from './pages/LogedIn/Profile';
 import { SearchPositions } from './pages/LogedIn/SearchPositions';
 import { Project } from './pages/LogedIn/Project';
 import { ProjectDashboard } from './pages/LogedIn/ProjectDashboard';
+import { SearchDevelopers } from './pages/LogedIn/SearchDevelopers';
 
 function App() {
   return (
@@ -32,6 +33,11 @@ function App() {
               exact
               path="/resetpassword"
               component={ResetPassword}
+            />
+            <AuthenticatedRoute
+              exact
+              path="/developer/search/:positionId"
+              component={SearchDevelopers}
             />
             <AuthenticatedRoute
               path="/projectdashboard"
