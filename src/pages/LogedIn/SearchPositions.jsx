@@ -179,7 +179,7 @@ export const SearchPositions = props => {
                 alignItems="center"
               >
                 <LinkOverlay
-                  href="#"
+                  cursor="pointer"
                   onClick={() => {
                     setModalValues(position);
                     onOpen();

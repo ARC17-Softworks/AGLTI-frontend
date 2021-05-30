@@ -34,7 +34,7 @@ export const MemberCard = ({ refetch, member, dashboard }) => {
   const toast = useToast();
 
   const [removeDeveloper, { loading }] = useMutation(REMOVE_DEVELOPER, {
-    onCompleted(proxy, result) {
+    onCompleted() {
       refetch();
     },
     variables: {
@@ -79,6 +79,7 @@ export const MemberCard = ({ refetch, member, dashboard }) => {
       <LinkBox
         maxW={'320px'}
         w={'full'}
+        h={'full'}
         bg={useColorModeValue('white', 'gray.700')}
         boxShadow={'2xl'}
         rounded={'lg'}
