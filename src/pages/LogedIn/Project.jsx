@@ -20,8 +20,6 @@ import { MemberCard } from '../../components/project/MemberCard';
 export const Project = props => {
   const { projectId } = props.match.params;
 
-  console.log(projectId);
-
   const { data, loading, error } = useQuery(GET_PROJECT, {
     variables: { projectId },
     skip: !projectId,

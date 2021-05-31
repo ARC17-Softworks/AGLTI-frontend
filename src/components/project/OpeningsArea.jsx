@@ -63,7 +63,7 @@ import { Loading } from '../Loading';
 import MultiSelect from '../form/MultiSelect';
 import { skillsList } from '../../data/skillsList';
 
-export const OpeningsArea = () => {
+export const OpeningsArea = ({ setDevSearch }) => {
   const authContext = useContext(AuthContext);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -541,8 +541,7 @@ export const OpeningsArea = () => {
                         fontSize="md"
                         variant="outline"
                         w="full"
-                        as={RouterLink}
-                        to={`/developer/search/${opening.position.id}`}
+                        onClick={() => setDevSearch(opening.position.id)}
                       >
                         Search for Developer
                       </Button>
@@ -610,8 +609,7 @@ export const OpeningsArea = () => {
               fontSize="md"
               variant="outline"
               ref={initialRef}
-              as={RouterLink}
-              to={`/developer/search/${modalValues.id}`}
+              onClick={() => setDevSearch(modalValues.id)}
             >
               Search for Developer
             </Button>

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Grid, GridItem, Box } from '@chakra-ui/react';
 import {
   Redirect,
@@ -17,12 +17,18 @@ export const ProjectDashboard = () => {
   const context = useContext(AuthContext);
   const { path } = useRouteMatch();
 
+  const [devSearch, setDevSearch] = useState('');
+
   if (!context.profile) {
     return <Redirect to="/createprofile" />;
   }
 
   if (!context.profile.activeProject) {
     return <Redirect to="/dashboard" />;
+  }
+
+  if (devSearch.length === 24) {
+    return <Redirect to={`/developer/search/${devSearch}`} />;
   }
 
   return (
@@ -39,7 +45,7 @@ export const ProjectDashboard = () => {
                   <InfoArea />
                 </Route>
                 <Route exact path={`${path}/openings`}>
-                  <OpeningsArea />
+                  <OpeningsArea setDevSearch={setDevSearch} />
                 </Route>
                 <Route exact path={`${path}/members`}>
                   <MemberArea />

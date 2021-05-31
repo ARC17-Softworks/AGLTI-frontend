@@ -57,6 +57,8 @@ export const SearchPositions = props => {
   const [buttonState, setButtonState] = useState([false, false]);
   const [applyId, setApplyId] = useState('');
 
+  const toast = useToast();
+
   const { data, loading, refetch, networkStatus, error } = useQuery(
     SEARCH_POSITIONS,
     {
@@ -110,8 +112,6 @@ export const SearchPositions = props => {
       }
     },
   });
-
-  const toast = useToast();
 
   const positions =
     data && data.searchPositions ? data.searchPositions.positions : null;
@@ -359,7 +359,7 @@ export const SearchPositions = props => {
             </Modal>
             <Flex direction="row" justify="center">
               <ButtonGroup
-                mt="4"
+                my="4"
                 isAttached
                 alignItems="center"
                 colorScheme="blue"
