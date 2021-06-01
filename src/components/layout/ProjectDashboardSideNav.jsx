@@ -105,17 +105,19 @@ export const ProjectDashboardSideNav = () => {
               variant="ghost"
               justifyContent="start"
               leftIcon={<ArchiveTray weight="fill" />}
+              {...(dashboardContext.applicants > 0 && {
+                rightIcon: (
+                  <Circle bg="red" size={4} color="white" fontSize="14px">
+                    {dashboardContext.applicants}
+                  </Circle>
+                ),
+              })}
               size="md"
               as={RouterLink}
               to="/projectdashboard/openings"
               w="full"
             >
               Open Positions{' '}
-              {dashboardContext.applicants > 0 && (
-                <Circle bg="red" size={4} color="white" fontSize="14px">
-                  {dashboardContext.applicants}
-                </Circle>
-              )}
             </Button>
           )}
           <Button

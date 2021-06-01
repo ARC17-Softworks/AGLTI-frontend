@@ -16,7 +16,7 @@ import { MemberCard } from './MemberCard';
 
 export const MemberArea = () => {
   const authContext = useContext(AuthContext);
-  const { setApplicants } = useContext(ProjectDashboardContext);
+  const { setApplicants, setTasks } = useContext(ProjectDashboardContext);
 
   const { data, loading, refetch, networkStatus, error } = useQuery(
     PROJECT_DASHBOARD_QUERY,
@@ -37,8 +37,13 @@ export const MemberArea = () => {
         applicant => applicant.read === false
       ).length;
       setApplicants(unreadApplicants);
+
+      const unreadTasks = project.tasks.filter(
+        task => task.read === false && authContext.user.id === task.dev.id
+      ).length;
+      setTasks(unreadTasks);
     }
-  }, [project, setApplicants, authContext]);
+  }, [project, setApplicants, setTasks, authContext]);
 
   if (error && error.message === 'Not authorised to access this resource') {
     authContext.setProfile({

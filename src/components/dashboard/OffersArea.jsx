@@ -224,7 +224,7 @@ export const OffersArea = ({ setProjectEnrolled }) => {
               alignItems="center"
             >
               <LinkOverlay
-                href="#"
+                cursor="pointer"
                 onClick={() => {
                   setModalValues(offers.position);
                   onOpen();

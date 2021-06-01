@@ -76,17 +76,19 @@ export const DashboardSideNav = () => {
         variant="ghost"
         justifyContent="start"
         leftIcon={<ArchiveTray weight="fill" />}
+        {...(dashboardContext.offers > 0 && {
+          rightIcon: (
+            <Circle bg="red" size={4} color="white" fontSize="14px">
+              {dashboardContext.offers}
+            </Circle>
+          ),
+        })}
         size="md"
         as={RouterLink}
         to="/dashboard/offers"
         w="full"
       >
-        Offers{' '}
-        {dashboardContext.offers > 0 && (
-          <Circle bg="red" size={4} color="white" fontSize="14px">
-            {dashboardContext.offers}
-          </Circle>
-        )}
+        Offers
       </Button>
     </>
   );
