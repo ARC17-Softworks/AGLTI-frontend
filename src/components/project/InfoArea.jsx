@@ -51,7 +51,7 @@ export const InfoArea = props => {
     onClose: onEditClose,
   } = useDisclosure();
   const cancelRef = React.useRef();
-  const { setApplicants } = useContext(ProjectDashboardContext);
+  const { setApplicants, setTasks } = useContext(ProjectDashboardContext);
 
   const toast = useToast();
 
@@ -170,8 +170,13 @@ export const InfoArea = props => {
         applicant => applicant.read === false
       ).length;
       setApplicants(unreadApplicants);
+
+      const unreadTasks = project.tasks.filter(
+        task => task.read === false && authContext.user.id === task.dev.id
+      ).length;
+      setTasks(unreadTasks);
     }
-  }, [project, setApplicants, authContext]);
+  }, [project, setApplicants, setTasks, authContext]);
 
   const onChange = e => {
     setValues({ ...values, [e.target.name]: e.target.value });

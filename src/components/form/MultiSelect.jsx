@@ -41,6 +41,7 @@ const chakraStyles = {
   menuList: () => {},
   option: () => {},
   multiValue: () => {},
+  singleValue: () => {},
   multiValueLabel: () => {},
   multiValueRemove: () => {},
   group: () => {},

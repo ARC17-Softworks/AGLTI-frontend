@@ -85,7 +85,7 @@ export const OpeningsArea = ({ setDevSearch }) => {
   const cancelRef = React.useRef();
   const initialRef = React.useRef();
 
-  const { setApplicants } = useContext(ProjectDashboardContext);
+  const { setApplicants, setTasks } = useContext(ProjectDashboardContext);
 
   const [devId, setDevId] = useState('');
 
@@ -384,9 +384,15 @@ export const OpeningsArea = ({ setDevSearch }) => {
         applicant => applicant.read === false
       ).length;
       setApplicants(unreadApplicants);
+
+      const unreadTasks = project.tasks.filter(
+        task => task.read === false && authContext.user.id === task.dev.id
+      ).length;
+      setTasks(unreadTasks);
+
       markRead({ variables: { path: 'applicants' } });
     }
-  }, [project, setApplicants, authContext, markRead]);
+  }, [project, setApplicants, authContext, setTasks, markRead]);
 
   if (loading && networkStatus !== NetworkStatus.refetch) {
     return <Loading />;
@@ -835,7 +841,6 @@ export const OpeningsArea = ({ setDevSearch }) => {
               </Button>
               <Button
                 colorScheme="red"
-                size="lg"
                 fontSize="md"
                 onClick={() => {
                   deletePosition({

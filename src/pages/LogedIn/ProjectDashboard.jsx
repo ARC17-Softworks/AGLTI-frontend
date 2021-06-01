@@ -12,6 +12,7 @@ import { AuthContext } from '../../context/auth';
 import { InfoArea } from '../../components/project/InfoArea';
 import { OpeningsArea } from '../../components/project/OpeningsArea';
 import { MemberArea } from '../../components/project/MemberArea';
+import { TasksArea } from '../../components/project/TasksArea';
 
 export const ProjectDashboard = () => {
   const context = useContext(AuthContext);
@@ -41,6 +42,9 @@ export const ProjectDashboard = () => {
           <GridItem>
             <Box maxW="container.xl" px={10} pt={2} mx="auto">
               <Switch>
+                <Route exact path={path}>
+                  <TasksArea />
+                </Route>
                 <Route exact path={`${path}/info`}>
                   <InfoArea />
                 </Route>
