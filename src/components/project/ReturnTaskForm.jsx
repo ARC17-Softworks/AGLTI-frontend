@@ -61,10 +61,6 @@ export const ReturnTaskForm = ({ taskId, onClose, ...props }) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
-  const multiSelectOnchange = value => {
-    setValues({ ...values, userId: value.value });
-  };
-
   const onSubmit = e => {
     e.preventDefault();
     returnTask();

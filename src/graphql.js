@@ -214,6 +214,7 @@ export const PROJECT_DASHBOARD_QUERY = gql`
             description
             skills
             date
+            isPrivate
           }
         }
         applicants {
