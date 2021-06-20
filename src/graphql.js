@@ -266,7 +266,6 @@ export const PROJECT_DASHBOARD_QUERY = gql`
           }
           title
           description
-          note
           status
           startDate
           dueDate

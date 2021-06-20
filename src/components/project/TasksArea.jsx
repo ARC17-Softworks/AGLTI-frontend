@@ -40,31 +40,24 @@ import {
   LinkOverlay,
   ButtonGroup,
   ModalHeader,
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
   HStack,
-  Stack,
 } from '@chakra-ui/react';
 import {
-  ExternalLinkIcon,
   AddIcon,
   ArrowRightIcon,
   DeleteIcon,
-  SearchIcon,
+  EditIcon,
   CheckIcon,
   ArrowLeftIcon,
 } from '@chakra-ui/icons';
-import { useQuery, useMutation, gql, NetworkStatus } from '@apollo/client';
+import { useQuery, useMutation, gql } from '@apollo/client';
 import { PROJECT_DASHBOARD_QUERY, MARK_READ } from '../../graphql';
 import { ProjectDashboardContext } from '../../context/projectDashboard';
 import { AuthContext } from '../../context/auth';
 import { Link as RouterLink, Redirect } from 'react-router-dom';
 import { Loading } from '../Loading';
 import { AddTaskForm } from './AddTaskForm';
-import { ReturnTaskForm } from './ReturnTaskForm';
+import { EditTaskForm } from './EditTaskForm';
 
 export const TasksArea = () => {
   const authContext = useContext(AuthContext);
@@ -98,9 +91,9 @@ export const TasksArea = () => {
   const cancelRef = React.useRef();
 
   const {
-    isOpen: returnIsOpen,
-    onOpen: returnOnOpen,
-    onClose: returnOnClose,
+    isOpen: editIsOpen,
+    onOpen: editOnOpen,
+    onClose: editOnClose,
   } = useDisclosure();
 
   const [modalValues, setModalValues] = useState({
@@ -108,7 +101,6 @@ export const TasksArea = () => {
     title: '',
     description: '',
     dev: null,
-    note: '',
     status: '',
     startDate: Date.now(),
     dueDate: Date.now(),
@@ -261,6 +253,12 @@ export const TasksArea = () => {
     }
   }, [project, setApplicants, authContext, setTasks, markRead, tasksUnread]);
 
+  useEffect(() => {
+    if (project && authContext.profile.activeProject && detailsIsOpen) {
+      setModalValues(project.tasks.find(task => task.id === modalValues.id));
+    }
+  }, [project, setModalValues, authContext, detailsIsOpen, modalValues]);
+
   if (!data) {
     return <Loading />;
   }
@@ -407,18 +405,6 @@ export const TasksArea = () => {
                         {authContext.profile.projectOwner &&
                           task.status !== 'COMPLETE' && (
                             <ButtonGroup size="xs" isAttached variant="outline">
-                              {/* <Tooltip hasArrow label="Delete Task">
-                                <IconButton
-                                  colorScheme="red"
-                                  icon={<DeleteIcon />}
-                                  variant="outline"
-                                  // isLoading={
-                                  //   pushLoading && clickedTaskId === task.id
-                                  // }
-                                  onClick={deleteOnOpen}
-                                />
-                              </Tooltip> */}
-
                               {task.status === 'DONE' && (
                                 <>
                                   <Tooltip hasArrow label="Send Task Back">
@@ -428,7 +414,7 @@ export const TasksArea = () => {
                                       variant="outline"
                                       onClick={() => {
                                         setClickedTaskId(task.id);
-                                        returnOnOpen();
+                                        editOnOpen();
                                       }}
                                     />
                                   </Tooltip>
@@ -471,8 +457,43 @@ export const TasksArea = () => {
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>{modalValues.title}</ModalHeader>
-          <ModalCloseButton />
+          <ModalHeader>
+            <Flex
+              w="full"
+              pr={8}
+              alignItems="start"
+              justifyContent="space-between"
+            >
+              <Heading>{modalValues.title}</Heading>
+              <Spacer />
+              {authContext.profile.projectOwner &&
+                modalValues.status !== 'COMPLETE' && (
+                  <ButtonGroup>
+                    <Tooltip hasArrow label="Edit Task">
+                      <IconButton
+                        size="sm"
+                        icon={<EditIcon />}
+                        variant="outline"
+                        onClick={editOnOpen}
+                      />
+                    </Tooltip>
+                    <Tooltip hasArrow label="Delete Task">
+                      <IconButton
+                        colorScheme="red"
+                        size="sm"
+                        icon={<DeleteIcon />}
+                        variant="outline"
+                        // isLoading={
+                        //   pushLoading && clickedTaskId === task.id
+                        // }
+                        onClick={deleteOnOpen}
+                      />
+                    </Tooltip>
+                  </ButtonGroup>
+                )}
+            </Flex>
+          </ModalHeader>
+          <ModalCloseButton mt={1.5} />
           <ModalBody px={8}>
             <Text pt={2} pb={6}>
               {modalValues.description}
@@ -495,11 +516,7 @@ export const TasksArea = () => {
                   : 'N/A'}
               </Text>
             </Text>
-            {modalValues.note && (
-              <Text fontWeight="bold" fontStyle="italic">
-                Note: <Text as="span">{modalValues.note}</Text>
-              </Text>
-            )}
+
             <HStack mt="4" alignItems="center">
               <Text fontWeight="bold">Asignee: </Text>{' '}
               {modalValues.dev && (
@@ -542,8 +559,8 @@ export const TasksArea = () => {
         </AlertDialogContent>
       </AlertDialog>
       <Modal
-        isOpen={returnIsOpen}
-        onClose={returnOnClose}
+        isOpen={editIsOpen}
+        onClose={editOnClose}
         size="3xl"
         scrollBehavior="outside"
       >
@@ -551,7 +568,11 @@ export const TasksArea = () => {
         <ModalContent>
           <ModalCloseButton />
           <ModalBody>
-            <ReturnTaskForm taskId={clickedTaskId} onClose={returnOnClose} />
+            <EditTaskForm
+              taskValues={modalValues}
+              members={project.members}
+              onClose={editOnClose}
+            />
           </ModalBody>
         </ModalContent>
       </Modal>
