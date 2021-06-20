@@ -4,14 +4,14 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Textarea,
+  InputGroup,
+  InputRightElement,
   VStack,
   Flex,
   Box,
   Text,
   Divider,
   Heading,
-  Link,
   Avatar,
   Spacer,
   Button,
@@ -41,6 +41,13 @@ import {
   ButtonGroup,
   ModalHeader,
   HStack,
+  Stack,
+  Drawer,
+  DrawerBody,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
 } from '@chakra-ui/react';
 import {
   AddIcon,
@@ -49,12 +56,12 @@ import {
   EditIcon,
   CheckIcon,
   ArrowLeftIcon,
+  HamburgerIcon,
 } from '@chakra-ui/icons';
 import { useQuery, useMutation, gql } from '@apollo/client';
 import { PROJECT_DASHBOARD_QUERY, MARK_READ } from '../../graphql';
 import { ProjectDashboardContext } from '../../context/projectDashboard';
 import { AuthContext } from '../../context/auth';
-import { Link as RouterLink, Redirect } from 'react-router-dom';
 import { Loading } from '../Loading';
 import { AddTaskForm } from './AddTaskForm';
 import { EditTaskForm } from './EditTaskForm';
@@ -67,9 +74,12 @@ export const TasksArea = () => {
   const dotBg = useColorModeValue('blue.400', 'blue.200');
   const cardBg = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const labelColor = useColorModeValue('gray.200', 'gray.800');
 
   const [tasksUnread, setTasksUnread] = useState([]);
   const [clickedTaskId, setClickedTaskId] = useState('');
+  const [labelValue, setLabelValue] = useState('');
+  const [deleteLabelValue, setDeleteLabelValue] = useState('');
 
   const {
     isOpen: detailsIsOpen,
@@ -94,6 +104,12 @@ export const TasksArea = () => {
     isOpen: editIsOpen,
     onOpen: editOnOpen,
     onClose: editOnClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: labelDrawerIsOpen,
+    onOpen: labelDrawerOnOpen,
+    onClose: labelDrawerOnClose,
   } = useDisclosure();
 
   const [modalValues, setModalValues] = useState({
@@ -255,6 +271,82 @@ export const TasksArea = () => {
     },
   });
 
+  const [addLabel, { loading: addLabelLoading }] = useMutation(ADD_LABEL, {
+    update() {
+      setLabelValue('');
+    },
+    onError(err) {
+      if (err.graphQLErrors[0]) {
+        if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+          toast({
+            title: Object.values(
+              err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                .constraints
+            )[0],
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        } else {
+          toast({
+            title: err.graphQLErrors[0].message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      } else {
+        toast({
+          title: err.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'bottom-left',
+        });
+      }
+    },
+  });
+
+  const [deleteLabel, { loading: deleteLabelLoading }] = useMutation(
+    DELETE_LABEL,
+    {
+      onError(err) {
+        if (err.graphQLErrors[0]) {
+          if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+            toast({
+              title: Object.values(
+                err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                  .constraints
+              )[0],
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          } else {
+            toast({
+              title: err.graphQLErrors[0].message,
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          }
+        } else {
+          toast({
+            title: err.message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      },
+    }
+  );
+
   const project = data ? data.currentProject.project : null;
 
   useEffect(() => {
@@ -307,13 +399,17 @@ export const TasksArea = () => {
         <Box>
           {authContext.profile.projectOwner && (
             <>
-              <Button
-                onClick={addOnOpen}
-                leftIcon={<AddIcon />}
-                variant="outline"
-              >
-                Add Task
-              </Button>
+              <ButtonGroup variant="outline" spacing="3">
+                <Button
+                  onClick={labelDrawerOnOpen}
+                  leftIcon={<HamburgerIcon />}
+                >
+                  Labels
+                </Button>
+                <Button onClick={addOnOpen} leftIcon={<AddIcon />}>
+                  Add Task
+                </Button>
+              </ButtonGroup>
               <Modal
                 isOpen={addIsOpen}
                 onClose={addOnClose}
@@ -518,9 +614,6 @@ export const TasksArea = () => {
                         size="sm"
                         icon={<DeleteIcon />}
                         variant="outline"
-                        // isLoading={
-                        //   pushLoading && clickedTaskId === task.id
-                        // }
                         onClick={deleteOnOpen}
                       />
                     </Tooltip>
@@ -613,6 +706,70 @@ export const TasksArea = () => {
           </ModalBody>
         </ModalContent>
       </Modal>
+      <Drawer
+        isOpen={labelDrawerIsOpen}
+        placement="right"
+        onClose={labelDrawerOnClose}
+      >
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Labels</DrawerHeader>
+
+          <DrawerBody>
+            <InputGroup size="md">
+              <Input
+                type="text"
+                placeholder="Add Label"
+                value={labelValue}
+                onChange={e => setLabelValue(e.target.value)}
+              />
+              <InputRightElement>
+                <IconButton
+                  colorScheme="green"
+                  size="sm"
+                  icon={<CheckIcon />}
+                  variant="ghost"
+                  onClick={() => {
+                    addLabel({ variables: { label: labelValue } });
+                  }}
+                  isLoading={addLabelLoading}
+                />
+              </InputRightElement>
+            </InputGroup>
+            <VStack mt="6" w="full">
+              {project.taskLabels.map(label => (
+                <Box
+                  rounded={'md'}
+                  w="full"
+                  p="1"
+                  bg={labelColor}
+                  boxShadow={'2xl'}
+                  key={label}
+                >
+                  <Stack direction="row" justifyContent="space-between">
+                    <Text pl={1}>{label}</Text>
+                    <Spacer />
+                    <IconButton
+                      colorScheme="red"
+                      size="sm"
+                      icon={<DeleteIcon />}
+                      variant="ghost"
+                      onClick={() => {
+                        setDeleteLabelValue(label);
+                        deleteLabel({ variables: { label } });
+                      }}
+                      isLoading={
+                        deleteLabelLoading && label === deleteLabelValue
+                      }
+                    />
+                  </Stack>
+                </Box>
+              ))}
+            </VStack>
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
     </Box>
   );
 };
@@ -632,5 +789,17 @@ const DELETE_TASK = gql`
 const CLOSE_TASK = gql`
   mutation closeTask($taskId: String!) {
     closeTask(taskId: $taskId)
+  }
+`;
+
+const ADD_LABEL = gql`
+  mutation addLabel($label: String!) {
+    addLabel(label: $label)
+  }
+`;
+
+const DELETE_LABEL = gql`
+  mutation deleteLabel($label: String!) {
+    deleteLabel(label: $label)
   }
 `;

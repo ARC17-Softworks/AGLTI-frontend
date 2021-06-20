@@ -256,6 +256,7 @@ export const PROJECT_DASHBOARD_QUERY = gql`
           title
           skills
         }
+        taskLabels
         taskColumns
         tasks {
           id
@@ -267,9 +268,25 @@ export const PROJECT_DASHBOARD_QUERY = gql`
           title
           description
           status
+          labels
+          checkList {
+            id
+            description
+            checked
+          }
           startDate
           dueDate
           read
+          comments {
+            id
+            user {
+              id
+              name
+              avatar
+            }
+            text
+            date
+          }
         }
         createdAt
       }
