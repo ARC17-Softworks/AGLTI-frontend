@@ -185,6 +185,41 @@ export const TasksArea = () => {
     },
   });
 
+  const [deleteTask] = useMutation(DELETE_TASK, {
+    onError(err) {
+      if (err.graphQLErrors[0]) {
+        if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+          toast({
+            title: Object.values(
+              err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                .constraints
+            )[0],
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        } else {
+          toast({
+            title: err.graphQLErrors[0].message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      } else {
+        toast({
+          title: err.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'bottom-left',
+        });
+      }
+    },
+  });
+
   const [closeTask, { loading: closeLoading }] = useMutation(CLOSE_TASK, {
     onError(err) {
       if (err.graphQLErrors[0]) {
@@ -550,7 +585,9 @@ export const TasksArea = () => {
               colorScheme="red"
               fontSize="md"
               onClick={() => {
+                deleteTask({ variables: { taskId: modalValues.id } });
                 deleteOnClose();
+                detailsOnClose();
               }}
             >
               Yes
@@ -585,6 +622,13 @@ const PUSH_TASK = gql`
     pushTask(taskId: $taskId)
   }
 `;
+
+const DELETE_TASK = gql`
+  mutation deleteTask($taskId: String!) {
+    deleteTask(taskId: $taskId)
+  }
+`;
+
 const CLOSE_TASK = gql`
   mutation closeTask($taskId: String!) {
     closeTask(taskId: $taskId)
