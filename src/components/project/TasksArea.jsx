@@ -1,8 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
-  chakra,
-  FormControl,
-  FormLabel,
   Input,
   InputGroup,
   InputRightElement,
@@ -51,11 +48,9 @@ import {
 } from '@chakra-ui/react';
 import {
   AddIcon,
-  ArrowRightIcon,
   DeleteIcon,
   EditIcon,
   CheckIcon,
-  ArrowLeftIcon,
   HamburgerIcon,
 } from '@chakra-ui/icons';
 import { useQuery, useMutation, gql } from '@apollo/client';
@@ -65,6 +60,7 @@ import { AuthContext } from '../../context/auth';
 import { Loading } from '../Loading';
 import { AddTaskForm } from './AddTaskForm';
 import { EditTaskForm } from './EditTaskForm';
+import { SetTaskLabelsForm } from './SetTaskLabelsForm';
 
 export const TasksArea = () => {
   const authContext = useContext(AuthContext);
@@ -77,9 +73,9 @@ export const TasksArea = () => {
   const labelColor = useColorModeValue('gray.200', 'gray.800');
 
   const [tasksUnread, setTasksUnread] = useState([]);
-  const [clickedTaskId, setClickedTaskId] = useState('');
   const [labelValue, setLabelValue] = useState('');
   const [deleteLabelValue, setDeleteLabelValue] = useState('');
+  const [editTaskLabels, setEditTaskLabels] = useState(false);
 
   const {
     isOpen: detailsIsOpen,
@@ -117,9 +113,12 @@ export const TasksArea = () => {
     title: '',
     description: '',
     dev: null,
+    labels: [],
     status: '',
     startDate: Date.now(),
     dueDate: Date.now(),
+    checkList: [],
+    comments: [],
     read: false,
   });
 
@@ -163,7 +162,7 @@ export const TasksArea = () => {
     },
   });
 
-  const [pushTask, { loading: pushLoading }] = useMutation(PUSH_TASK, {
+  const [pushTask] = useMutation(PUSH_TASK, {
     update(proxy, result) {
       setTasksUnread([]);
     },
@@ -236,7 +235,7 @@ export const TasksArea = () => {
     },
   });
 
-  const [closeTask, { loading: closeLoading }] = useMutation(CLOSE_TASK, {
+  const [closeTask] = useMutation(CLOSE_TASK, {
     onError(err) {
       if (err.graphQLErrors[0]) {
         if (err.graphQLErrors[0].message === 'Argument Validation Error') {
@@ -480,6 +479,17 @@ export const TasksArea = () => {
                           {task.title}
                         </Text>
                       </LinkOverlay>
+                      {task.labels.length > 0 && (
+                        <HStack>
+                          {' '}
+                          <Badge>{task.labels[0]}</Badge>{' '}
+                          {task.labels.length > 1 && (
+                            <Text fontSize="small" color="gray.500">
+                              +{task.labels.length - 1}
+                            </Text>
+                          )}
+                        </HStack>
+                      )}
                       <Text
                         w="full"
                         color="gray.500"
@@ -489,87 +499,32 @@ export const TasksArea = () => {
                       >
                         {task.description}
                       </Text>
-                      <Text w="full" fontSize="sm" fontStyle="italic">
-                        {task.startDate &&
-                          task.dueDate &&
-                          `${
-                            new Date(task.startDate)
-                              .toLocaleString('en-GB')
-                              .split(',')[0]
-                          } -  ${
-                            new Date(task.dueDate)
-                              .toLocaleString('en-GB')
-                              .split(',')[0]
-                          }`}
-                        {!task.startDate &&
-                          task.dueDate &&
-                          `Due: ${
-                            new Date(task.dueDate)
-                              .toLocaleString('en-GB')
-                              .split(',')[0]
-                          }`}
-                      </Text>
-                      <Flex w="full" flexGrow={1} alignItems="end">
+
+                      <Flex w="full" flexGrow={1} alignItems="center">
                         <Tooltip hasArrow label={task.dev.name}>
                           <Avatar size="xs" src={task.dev.avatar} />
                         </Tooltip>
                         <Spacer />
-                        {!authContext.profile.projectOwner &&
-                          authContext.user.id === task.dev.id &&
-                          task.status !== 'DONE' &&
-                          task.status !== 'COMPLETE' && (
-                            <Tooltip hasArrow label="Push Task">
-                              <IconButton
-                                size="xs"
-                                icon={<ArrowRightIcon />}
-                                variant="outline"
-                                isLoading={
-                                  pushLoading && clickedTaskId === task.id
-                                }
-                                onClick={() => {
-                                  setClickedTaskId(task.id);
-                                  pushTask({ variables: { taskId: task.id } });
-                                }}
-                              />
-                            </Tooltip>
-                          )}
-                        {authContext.profile.projectOwner &&
-                          task.status !== 'COMPLETE' && (
-                            <ButtonGroup size="xs" isAttached variant="outline">
-                              {task.status === 'DONE' && (
-                                <>
-                                  <Tooltip hasArrow label="Send Task Back">
-                                    <IconButton
-                                      colorScheme="orange"
-                                      icon={<ArrowLeftIcon />}
-                                      variant="outline"
-                                      onClick={() => {
-                                        setClickedTaskId(task.id);
-                                        editOnOpen();
-                                      }}
-                                    />
-                                  </Tooltip>
-                                  <Tooltip hasArrow label="Close Task">
-                                    <IconButton
-                                      colorScheme="green"
-                                      icon={<CheckIcon />}
-                                      variant="outline"
-                                      isLoading={
-                                        closeLoading &&
-                                        clickedTaskId === task.id
-                                      }
-                                      onClick={() => {
-                                        setClickedTaskId(task.id);
-                                        closeTask({
-                                          variables: { taskId: task.id },
-                                        });
-                                      }}
-                                    />
-                                  </Tooltip>
-                                </>
-                              )}
-                            </ButtonGroup>
-                          )}
+                        <Text fontSize="xs" fontStyle="italic">
+                          {task.startDate &&
+                            task.dueDate &&
+                            `${
+                              new Date(task.startDate)
+                                .toLocaleString('en-GB')
+                                .split(',')[0]
+                            } -  ${
+                              new Date(task.dueDate)
+                                .toLocaleString('en-GB')
+                                .split(',')[0]
+                            }`}
+                          {!task.startDate &&
+                            task.dueDate &&
+                            `Due: ${
+                              new Date(task.dueDate)
+                                .toLocaleString('en-GB')
+                                .split(',')[0]
+                            }`}
+                        </Text>
                       </Flex>
                     </Flex>
                   </LinkBox>
@@ -623,6 +578,32 @@ export const TasksArea = () => {
           </ModalHeader>
           <ModalCloseButton mt={1.5} />
           <ModalBody px={8}>
+            {modalValues.labels.length > 0 && !editTaskLabels && (
+              <Wrap mb="3">
+                {modalValues.labels.map(label => (
+                  <WrapItem key={label}>
+                    <Badge>{label}</Badge>
+                  </WrapItem>
+                ))}
+              </Wrap>
+            )}
+            {authContext.profile.projectOwner && editTaskLabels && (
+              <SetTaskLabelsForm
+                taskId={modalValues.id}
+                taskLabels={project.taskLabels}
+                labels={modalValues.labels}
+                setEditTaskLabels={setEditTaskLabels}
+              />
+            )}
+            {authContext.profile.projectOwner &&
+              modalValues.status !== 'COMPLETE' && (
+                <Button
+                  size="sm"
+                  onClick={() => setEditTaskLabels(!editTaskLabels)}
+                >
+                  {editTaskLabels ? 'Cancel' : 'Edit Labels'}
+                </Button>
+              )}
             <Text pt={2} pb={6}>
               {modalValues.description}
             </Text>

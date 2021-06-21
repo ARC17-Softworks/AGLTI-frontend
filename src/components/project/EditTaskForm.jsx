@@ -24,8 +24,6 @@ export const EditTaskForm = ({ taskValues, members, onClose, ...props }) => {
     description: taskValues.description,
   });
 
-  console.log(members);
-
   const [startDate, setStartDate] = useState(
     taskValues.startDate ? new Date(taskValues.startDate) : null
   );
