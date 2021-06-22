@@ -45,6 +45,7 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
+  Checkbox,
 } from '@chakra-ui/react';
 import {
   AddIcon,
@@ -76,6 +77,8 @@ export const TasksArea = () => {
   const [labelValue, setLabelValue] = useState('');
   const [deleteLabelValue, setDeleteLabelValue] = useState('');
   const [editTaskLabels, setEditTaskLabels] = useState(false);
+  const [checkListItem, setCheckListItem] = useState('');
+  const [checkListId, setCheckListId] = useState('');
 
   const {
     isOpen: detailsIsOpen,
@@ -346,6 +349,118 @@ export const TasksArea = () => {
     }
   );
 
+  const [addCheckListItem, { loading: addCheckListItemLoading }] = useMutation(
+    ADD_CHECKLIST_ITEM,
+    {
+      update() {
+        setCheckListItem('');
+      },
+      onError(err) {
+        if (err.graphQLErrors[0]) {
+          if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+            toast({
+              title: Object.values(
+                err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                  .constraints
+              )[0],
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          } else {
+            toast({
+              title: err.graphQLErrors[0].message,
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          }
+        } else {
+          toast({
+            title: err.message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      },
+    }
+  );
+
+  const [removeCheckListItem, { loading: removeCheckListItemLoading }] =
+    useMutation(REMOVE_CHECKLIST_ITEM, {
+      onError(err) {
+        if (err.graphQLErrors[0]) {
+          if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+            toast({
+              title: Object.values(
+                err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                  .constraints
+              )[0],
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          } else {
+            toast({
+              title: err.graphQLErrors[0].message,
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          }
+        } else {
+          toast({
+            title: err.message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      },
+    });
+
+  const [checkCheckListItem] = useMutation(CHECK_CHECKLIST_ITEM, {
+    onError(err) {
+      if (err.graphQLErrors[0]) {
+        if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+          toast({
+            title: Object.values(
+              err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                .constraints
+            )[0],
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        } else {
+          toast({
+            title: err.graphQLErrors[0].message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      } else {
+        toast({
+          title: err.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'bottom-left',
+        });
+      }
+    },
+  });
+
   const project = data ? data.currentProject.project : null;
 
   useEffect(() => {
@@ -607,6 +722,85 @@ export const TasksArea = () => {
             <Text pt={2} pb={6}>
               {modalValues.description}
             </Text>
+            {modalValues.checkList.length > 0 && (
+              <VStack w="xl" mb="2" alignItems="start">
+                {modalValues.checkList.map(item => (
+                  <Stack
+                    w="full"
+                    direction="row"
+                    key={item.id}
+                    justifyContent="space-between"
+                  >
+                    <Checkbox
+                      {...(authContext.user.id !== modalValues.dev.id && {
+                        isReadOnly: true,
+                      })}
+                      isChecked={item.checked}
+                      onChange={e =>
+                        checkCheckListItem({
+                          variables: {
+                            taskId: modalValues.id,
+                            checklistId: item.id,
+                            checkState: e.target.checked,
+                          },
+                        })
+                      }
+                    >
+                      {item.description}
+                    </Checkbox>
+                    <Spacer />
+                    {authContext.profile.projectOwner &&
+                      modalValues.status !== 'COMPLETE' && (
+                        <IconButton
+                          colorScheme="red"
+                          size="sm"
+                          icon={<DeleteIcon />}
+                          variant="ghost"
+                          onClick={() => {
+                            setCheckListId(item.id);
+                            removeCheckListItem({
+                              variables: {
+                                taskId: modalValues.id,
+                                checklistId: item.id,
+                              },
+                            });
+                          }}
+                          isLoading={
+                            removeCheckListItemLoading &&
+                            item.id === checkListId
+                          }
+                        />
+                      )}
+                  </Stack>
+                ))}
+              </VStack>
+            )}
+            {authContext.profile.projectOwner &&
+              modalValues.status !== 'COMPLETE' && (
+                <InputGroup w="xl" mb="2" size="md" alignItems="center">
+                  <Input
+                    type="text"
+                    placeholder="Add Checklist item"
+                    value={checkListItem}
+                    onChange={e => setCheckListItem(e.target.value)}
+                  />
+                  <IconButton
+                    colorScheme="green"
+                    size="sm"
+                    variant="ghost"
+                    icon={<CheckIcon />}
+                    onClick={() => {
+                      addCheckListItem({
+                        variables: {
+                          taskId: modalValues.id,
+                          description: checkListItem,
+                        },
+                      });
+                    }}
+                    isLoading={addCheckListItemLoading}
+                  />
+                </InputGroup>
+              )}
             <Text fontWeight="bold" fontStyle="italic">
               Start Date:{' '}
               <Text as="span" color="gray.500">
@@ -634,6 +828,10 @@ export const TasksArea = () => {
                 </Tooltip>
               )}
             </HStack>
+            <Text pt="3" fontWeight="bold" fontSize="lg">
+              Comments
+            </Text>
+            <Divider />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -782,5 +980,31 @@ const ADD_LABEL = gql`
 const DELETE_LABEL = gql`
   mutation deleteLabel($label: String!) {
     deleteLabel(label: $label)
+  }
+`;
+
+const ADD_CHECKLIST_ITEM = gql`
+  mutation addCheckListItem($taskId: String!, $description: String!) {
+    addCheckListItem(taskId: $taskId, description: $description)
+  }
+`;
+
+const REMOVE_CHECKLIST_ITEM = gql`
+  mutation removeCheckListItem($taskId: String!, $checklistId: String!) {
+    removeCheckListItem(taskId: $taskId, checklistId: $checklistId)
+  }
+`;
+
+const CHECK_CHECKLIST_ITEM = gql`
+  mutation checkCheckListItem(
+    $taskId: String!
+    $checklistId: String!
+    $checkState: Boolean!
+  ) {
+    checkCheckListItem(
+      taskId: $taskId
+      checklistId: $checklistId
+      checkState: $checkState
+    )
   }
 `;
