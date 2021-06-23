@@ -248,7 +248,10 @@ export const TasksArea = () => {
     },
   });
 
-  const [closeTask] = useMutation(CLOSE_TASK, {
+  const [closeTask, { loading: closeTaskLoading }] = useMutation(CLOSE_TASK, {
+    update(proxy, result) {
+      detailsOnClose();
+    },
     onError(err) {
       if (err.graphQLErrors[0]) {
         if (err.graphQLErrors[0].message === 'Argument Validation Error') {
@@ -806,6 +809,18 @@ export const TasksArea = () => {
               {authContext.profile.projectOwner &&
                 modalValues.status !== 'COMPLETE' && (
                   <ButtonGroup>
+                    <Tooltip hasArrow label="Mark Task Complete">
+                      <IconButton
+                        size="sm"
+                        icon={<CheckIcon />}
+                        variant="outline"
+                        colorScheme="green"
+                        onClick={() =>
+                          closeTask({ variables: { taskId: modalValues.id } })
+                        }
+                        isLoading={closeTaskLoading}
+                      />
+                    </Tooltip>
                     <Tooltip hasArrow label="Edit Task">
                       <IconButton
                         size="sm"
