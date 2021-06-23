@@ -64,6 +64,7 @@ import { Loading } from '../Loading';
 import { AddTaskForm } from './AddTaskForm';
 import { EditTaskForm } from './EditTaskForm';
 import { SetTaskLabelsForm } from './SetTaskLabelsForm';
+import MultiSelect from '../form/MultiSelect';
 
 export const TasksArea = () => {
   const authContext = useContext(AuthContext);
@@ -84,6 +85,7 @@ export const TasksArea = () => {
   const [selectedCommentId, setSelectedCommentId] = useState('');
   const [textAreaValue, setTextAreaValue] = useState('');
   const [editTextAreaValue, setEditTextAreaValue] = useState('');
+  const [moveTo, setMoveTo] = useState('');
   const [commentEdit, setCommentEdit] = useState(false);
 
   const initialRef = React.useRef();
@@ -173,7 +175,7 @@ export const TasksArea = () => {
     },
   });
 
-  const [pushTask] = useMutation(PUSH_TASK, {
+  const [moveTask, { loading: moveTaskLoading }] = useMutation(MOVE_TASK, {
     update(proxy, result) {
       setTasksUnread([]);
     },
@@ -589,6 +591,10 @@ export const TasksArea = () => {
       },
     });
 
+  const multiSelectOnchange = value => {
+    setMoveTo(value.value);
+  };
+
   const project = data ? data.currentProject.project : null;
 
   useEffect(() => {
@@ -705,6 +711,7 @@ export const TasksArea = () => {
                       <LinkOverlay
                         cursor="pointer"
                         onClick={() => {
+                          setMoveTo('');
                           setModalValues(task);
                           detailsOnOpen();
                         }}
@@ -948,15 +955,63 @@ export const TasksArea = () => {
                   : 'N/A'}
               </Text>
             </Text>
-
-            <HStack mt="4" alignItems="center">
-              <Text fontWeight="bold">Asignee: </Text>{' '}
-              {modalValues.dev && (
-                <Tooltip hasArrow label={modalValues.dev.name}>
-                  <Avatar size="sm" src={modalValues.dev.avatar} />
-                </Tooltip>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <HStack mt="4" alignItems="center">
+                <Text fontWeight="bold">Asignee: </Text>{' '}
+                {modalValues.dev && (
+                  <Tooltip hasArrow label={modalValues.dev.name}>
+                    <Avatar size="sm" src={modalValues.dev.avatar} />
+                  </Tooltip>
+                )}
+              </HStack>
+              <Spacer />
+              {modalValues.dev && authContext.user.id === modalValues.dev.id && (
+                <HStack>
+                  <Box w="sm">
+                    <MultiSelect
+                      name="userId"
+                      placeholder="Move to..."
+                      options={project.taskColumns.reduce(
+                        (columnList, column) => {
+                          if (
+                            column !== 'COMPLETE' &&
+                            column !== modalValues.status
+                          ) {
+                            columnList.push({
+                              value: column,
+                              label: column,
+                            });
+                          }
+                          return columnList;
+                        },
+                        []
+                      )}
+                      onChange={multiSelectOnchange}
+                    />
+                  </Box>
+                  <Tooltip hasArrow label="Move Task To Column">
+                    <IconButton
+                      icon={<CheckIcon />}
+                      onClick={() => {
+                        moveTask({
+                          variables: {
+                            taskId: modalValues.id,
+                            column: moveTo,
+                          },
+                        });
+                      }}
+                      isLoading={moveTaskLoading}
+                      colorScheme="green"
+                      isDisabled={moveTo.length === 0}
+                    />
+                  </Tooltip>
+                </HStack>
               )}
-            </HStack>
+            </Stack>
             <Text pt="3" fontWeight="bold" fontSize="lg">
               Comments
             </Text>
@@ -987,9 +1042,9 @@ export const TasksArea = () => {
             </Button>
 
             {modalValues.comments.length > 0 && (
-              <VStack w="full">
+              <VStack my="5" w="full">
                 {modalValues.comments.map(comment => (
-                  <VStack my="5" w="full" key={comment.id}>
+                  <VStack w="full" key={comment.id}>
                     <HStack w="full">
                       <Avatar size="sm" src={comment.user.avatar} />
                       <Text>{comment.user.name}</Text>
@@ -1229,9 +1284,9 @@ export const TasksArea = () => {
   );
 };
 
-const PUSH_TASK = gql`
-  mutation pushTask($taskId: String!) {
-    pushTask(taskId: $taskId)
+const MOVE_TASK = gql`
+  mutation moveTask($taskId: String!, $column: String!) {
+    moveTask(taskId: $taskId, column: $column)
   }
 `;
 
