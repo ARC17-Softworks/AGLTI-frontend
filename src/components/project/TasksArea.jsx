@@ -46,6 +46,7 @@ import {
   DrawerContent,
   DrawerCloseButton,
   Checkbox,
+  Textarea,
 } from '@chakra-ui/react';
 import {
   AddIcon,
@@ -53,6 +54,7 @@ import {
   EditIcon,
   CheckIcon,
   HamburgerIcon,
+  CloseIcon,
 } from '@chakra-ui/icons';
 import { useQuery, useMutation, gql } from '@apollo/client';
 import { PROJECT_DASHBOARD_QUERY, MARK_READ } from '../../graphql';
@@ -79,6 +81,12 @@ export const TasksArea = () => {
   const [editTaskLabels, setEditTaskLabels] = useState(false);
   const [checkListItem, setCheckListItem] = useState('');
   const [checkListId, setCheckListId] = useState('');
+  const [selectedCommentId, setSelectedCommentId] = useState('');
+  const [textAreaValue, setTextAreaValue] = useState('');
+  const [editTextAreaValue, setEditTextAreaValue] = useState('');
+  const [commentEdit, setCommentEdit] = useState(false);
+
+  const initialRef = React.useRef();
 
   const {
     isOpen: detailsIsOpen,
@@ -461,6 +469,126 @@ export const TasksArea = () => {
     },
   });
 
+  const [addTaskComment, { loading: addTaskCommentLoading }] = useMutation(
+    CREATE_TASK_COMMENT,
+    {
+      update() {
+        setTextAreaValue('');
+      },
+      onError(err) {
+        if (err.graphQLErrors[0]) {
+          if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+            toast({
+              title: Object.values(
+                err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                  .constraints
+              )[0],
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          } else {
+            toast({
+              title: err.graphQLErrors[0].message,
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          }
+        } else {
+          toast({
+            title: err.message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      },
+    }
+  );
+
+  const [editTaskComment, { loading: editTaskCommentLoading }] = useMutation(
+    EDIT_TASK_COMMENT,
+    {
+      update() {
+        setEditTextAreaValue('');
+        setSelectedCommentId('');
+        setCommentEdit(false);
+      },
+      onError(err) {
+        if (err.graphQLErrors[0]) {
+          if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+            toast({
+              title: Object.values(
+                err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                  .constraints
+              )[0],
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          } else {
+            toast({
+              title: err.graphQLErrors[0].message,
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          }
+        } else {
+          toast({
+            title: err.message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      },
+    }
+  );
+
+  const [deleteTaskComment, { loading: deleteTaskCommentLoading }] =
+    useMutation(DELETE_TASK_COMMENT, {
+      onError(err) {
+        if (err.graphQLErrors[0]) {
+          if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+            toast({
+              title: Object.values(
+                err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                  .constraints
+              )[0],
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          } else {
+            toast({
+              title: err.graphQLErrors[0].message,
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          }
+        } else {
+          toast({
+            title: err.message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      },
+    });
+
   const project = data ? data.currentProject.project : null;
 
   useEffect(() => {
@@ -651,6 +779,7 @@ export const TasksArea = () => {
         ))}
       </HStack>
       <Modal
+        initialFocusRef={initialRef}
         isOpen={detailsIsOpen}
         onClose={detailsOnClose}
         size="5xl"
@@ -832,6 +961,153 @@ export const TasksArea = () => {
               Comments
             </Text>
             <Divider />
+            <Textarea
+              value={textAreaValue}
+              size="sm"
+              resize="vertical"
+              ref={initialRef}
+              mt="2"
+              onChange={e => setTextAreaValue(e.target.value)}
+            />
+            <Button
+              colorScheme="green"
+              fontSize="md"
+              size="md"
+              mt="1"
+              onClick={() => {
+                addTaskComment({
+                  variables: { taskId: modalValues.id, text: textAreaValue },
+                });
+              }}
+              isLoading={addTaskCommentLoading}
+              loadingText="Saving.."
+              spinnerPlacement="end"
+            >
+              Save
+            </Button>
+
+            {modalValues.comments.length > 0 && (
+              <VStack w="full">
+                {modalValues.comments.map(comment => (
+                  <VStack my="5" w="full" key={comment.id}>
+                    <HStack w="full">
+                      <Avatar size="sm" src={comment.user.avatar} />
+                      <Text>{comment.user.name}</Text>
+                      <Badge>
+                        {comment.user.id === project.owner.id
+                          ? 'Project Owner'
+                          : project.members.find(
+                              member => member.dev.id === comment.user.id
+                            ).title}
+                      </Badge>
+                      <Text fontStyle="italic" color="gray.500">
+                        {new Date(comment.date).toLocaleString('en-GB')}{' '}
+                        {comment.edited && '(edited)'}
+                      </Text>
+                    </HStack>
+                    {commentEdit && comment.id === selectedCommentId ? (
+                      <Textarea
+                        value={editTextAreaValue}
+                        size="sm"
+                        resize="vertical"
+                        mt="2"
+                        onChange={e => setEditTextAreaValue(e.target.value)}
+                      />
+                    ) : (
+                      <Box
+                        rounded={'lg'}
+                        borderWidth="1px"
+                        borderColor="gray.500"
+                        w="full"
+                        px="3"
+                        py="2"
+                      >
+                        <Text>{comment.text}</Text>
+                      </Box>
+                    )}
+                    <ButtonGroup
+                      w="full"
+                      justifyContent="end"
+                      spacing="0.5"
+                      variant="ghost"
+                    >
+                      {commentEdit && comment.id === selectedCommentId && (
+                        <Tooltip hasArrow label="Save">
+                          <IconButton
+                            size="sm"
+                            icon={<CheckIcon />}
+                            onClick={() => {
+                              editTaskComment({
+                                variables: {
+                                  taskId: modalValues.id,
+                                  commentId: comment.id,
+                                  text: editTextAreaValue,
+                                },
+                              });
+                            }}
+                            isLoading={
+                              editTaskCommentLoading &&
+                              comment.id === selectedCommentId
+                            }
+                            colorScheme="green"
+                          />
+                        </Tooltip>
+                      )}
+                      {authContext.user.id === comment.user.id && (
+                        <Tooltip
+                          hasArrow
+                          label={commentEdit ? 'Cancel' : 'Edit'}
+                        >
+                          <IconButton
+                            size="sm"
+                            {...(commentEdit
+                              ? { icon: <CloseIcon />, colorScheme: 'orange' }
+                              : { icon: <EditIcon />, colorScheme: 'gray' })}
+                            onClick={() => {
+                              if (!commentEdit) {
+                                setCommentEdit(true);
+                                setSelectedCommentId(comment.id);
+                                setEditTextAreaValue(comment.text);
+                              } else {
+                                setCommentEdit(false);
+                                setSelectedCommentId('');
+                                setEditTextAreaValue('');
+                              }
+                              console.log(selectedCommentId);
+                              console.log(editTextAreaValue);
+                              console.log(comment);
+                            }}
+                          />
+                        </Tooltip>
+                      )}
+                      {(authContext.user.id === comment.user.id ||
+                        authContext.profile.projectOwner) && (
+                        <Tooltip hasArrow label="Delete">
+                          <IconButton
+                            colorScheme="red"
+                            size="sm"
+                            icon={<DeleteIcon />}
+                            onClick={() => {
+                              setSelectedCommentId(comment.id);
+                              deleteTaskComment({
+                                variables: {
+                                  taskId: modalValues.id,
+                                  commentId: comment.id,
+                                },
+                              });
+                            }}
+                            isLoading={
+                              deleteTaskCommentLoading &&
+                              comment.id === selectedCommentId
+                            }
+                          />
+                        </Tooltip>
+                      )}
+                    </ButtonGroup>
+                  </VStack>
+                ))}
+              </VStack>
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -1006,5 +1282,27 @@ const CHECK_CHECKLIST_ITEM = gql`
       checklistId: $checklistId
       checkState: $checkState
     )
+  }
+`;
+
+const CREATE_TASK_COMMENT = gql`
+  mutation createTaskComment($taskId: String!, $text: String!) {
+    createTaskComment(taskId: $taskId, text: $text)
+  }
+`;
+
+const EDIT_TASK_COMMENT = gql`
+  mutation editTaskComment(
+    $taskId: String!
+    $commentId: String!
+    $text: String!
+  ) {
+    editTaskComment(taskId: $taskId, commentId: $commentId, text: $text)
+  }
+`;
+
+const DELETE_TASK_COMMENT = gql`
+  mutation deleteTaskComment($taskId: String!, $commentId: String!) {
+    deleteTaskComment(taskId: $taskId, commentId: $commentId)
   }
 `;

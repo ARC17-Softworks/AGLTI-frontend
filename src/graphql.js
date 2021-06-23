@@ -285,6 +285,7 @@ export const PROJECT_DASHBOARD_QUERY = gql`
               avatar
             }
             text
+            edited
             date
           }
         }
