@@ -137,7 +137,7 @@ export const ProjectDashboardSideNav = () => {
             justifyContent="start"
             size="md"
             as={RouterLink}
-            to="/projectdashboard/fourm"
+            to="/projectdashboard/forum"
             w="full"
           >
             Forum

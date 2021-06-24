@@ -48,6 +48,11 @@ import {
   Checkbox,
   Textarea,
   useMediaQuery,
+  Icon,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from '@chakra-ui/react';
 import {
   AddIcon,
@@ -57,6 +62,7 @@ import {
   HamburgerIcon,
   CloseIcon,
 } from '@chakra-ui/icons';
+import { DotsThreeOutlineVertical } from 'phosphor-react';
 import { useQuery, useMutation, gql } from '@apollo/client';
 import { PROJECT_DASHBOARD_QUERY, MARK_READ } from '../../graphql';
 import { ProjectDashboardContext } from '../../context/projectDashboard';
@@ -67,6 +73,8 @@ import { EditTaskForm } from './EditTaskForm';
 import { SetTaskLabelsForm } from './SetTaskLabelsForm';
 import MultiSelect from '../form/MultiSelect';
 import { AddColumnForm } from './AddColumnForm';
+import { MoveColumnForm } from './MoveColumnForm';
+import { DeleteColumnForm } from './DeleteColumnForm';
 
 export const TasksArea = () => {
   const authContext = useContext(AuthContext);
@@ -90,6 +98,7 @@ export const TasksArea = () => {
   const [editTextAreaValue, setEditTextAreaValue] = useState('');
   const [moveTo, setMoveTo] = useState('');
   const [commentEdit, setCommentEdit] = useState(false);
+  const [selectedColumn, setSelectedColumn] = useState('');
 
   const initialRef = React.useRef();
   const [isLargerThan1400] = useMediaQuery('(min-width: 1400px)');
@@ -158,10 +167,20 @@ export const TasksArea = () => {
     read: false,
   });
 
-  const { data } = useQuery(PROJECT_DASHBOARD_QUERY, {
-    pollInterval: 500,
-    fetchPolicy: 'no-cache',
-  });
+  const { data, startPolling, stopPolling } = useQuery(
+    PROJECT_DASHBOARD_QUERY,
+    {
+      // pollInterval: 500,
+      fetchPolicy: 'no-cache',
+    }
+  );
+
+  useEffect(() => {
+    startPolling(500);
+    return () => {
+      stopPolling();
+    };
+  }, [startPolling, stopPolling]);
 
   const [markRead] = useMutation(MARK_READ, {
     onError(err) {
@@ -733,11 +752,47 @@ export const TasksArea = () => {
                 pt="2"
                 mb="2"
               >
-                <Stack>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
                   <Heading w="full" as="h2" size="md">
                     {column}
                   </Heading>
                   <Spacer />
+                  {authContext.profile.projectOwner && column !== 'COMPLETE' && (
+                    <Menu>
+                      <MenuButton
+                        as={IconButton}
+                        aria-label="Options"
+                        icon={
+                          <Icon as={DotsThreeOutlineVertical} weight="fill" />
+                        }
+                        variant="ghost"
+                      />
+                      <MenuList>
+                        <MenuItem
+                          onClick={() => {
+                            setSelectedColumn(column);
+                            moveColumnOnOpen();
+                          }}
+                        >
+                          Move Column
+                        </MenuItem>
+                        {column !== 'TODO' && (
+                          <MenuItem
+                            onClick={() => {
+                              setSelectedColumn(column);
+                              deleteColumnOnOpen();
+                            }}
+                          >
+                            Delete Column
+                          </MenuItem>
+                        )}
+                      </MenuList>
+                    </Menu>
+                  )}
                 </Stack>
               </Box>
               <VStack>
@@ -1297,6 +1352,42 @@ export const TasksArea = () => {
             <AddColumnForm
               columns={project.taskColumns}
               onClose={addColumnOnClose}
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={moveColumnIsOpen}
+        onClose={moveColumnOnClose}
+        size="3xl"
+        scrollBehavior="outside"
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          <ModalBody>
+            <MoveColumnForm
+              column={selectedColumn}
+              columns={project.taskColumns}
+              onClose={moveColumnOnClose}
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={deleteColumnIsOpen}
+        onClose={deleteColumnOnClose}
+        size="3xl"
+        scrollBehavior="outside"
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          <ModalBody>
+            <DeleteColumnForm
+              column={selectedColumn}
+              columns={project.taskColumns}
+              onClose={deleteColumnOnClose}
             />
           </ModalBody>
         </ModalContent>

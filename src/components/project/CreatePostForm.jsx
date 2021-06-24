@@ -1,28 +1,34 @@
-import React, { useState } from 'react';
 import {
   Button,
   chakra,
+  Heading,
+  Stack,
   FormControl,
   FormLabel,
-  Stack,
+  Input,
   useToast,
-  Heading,
+  Textarea,
 } from '@chakra-ui/react';
+import React, { useState } from 'react';
 import { useMutation, gql } from '@apollo/client';
-import MultiSelect from '../form/MultiSelect';
 
-export const MoveColumnForm = ({ column, columns, onClose, ...props }) => {
+export const CreatePostForm = ({ onClose, refetch, ...props }) => {
   const [values, setValues] = useState({
-    position: columns.length - 1,
+    title: '',
+    text: '',
   });
 
   const toast = useToast();
 
-  const [moveColumn, { loading }] = useMutation(MOVE_COLUMN, {
+  const [creatPost, { loading }] = useMutation(CREATE_POST, {
     update(proxy, result) {
+      refetch();
       onClose();
     },
-    variables: { column: column, columnPos: values.position },
+    variables: {
+      title: values.title,
+      text: values.text,
+    },
     onError(err) {
       if (err.graphQLErrors[0]) {
         if (err.graphQLErrors[0].message === 'Argument Validation Error') {
@@ -57,59 +63,52 @@ export const MoveColumnForm = ({ column, columns, onClose, ...props }) => {
     },
   });
 
-  const multiSelectOnchange = value => {
-    setValues({ ...values, position: value.value });
+  const onChange = e => {
+    setValues({ ...values, [e.target.name]: e.target.value });
   };
 
   const onSubmit = e => {
     e.preventDefault();
-    moveColumn();
+    creatPost();
   };
-
   return (
     <chakra.form onSubmit={onSubmit} {...props}>
-      <Stack spacing="6" my="6">
-        <Heading>Move {column}?</Heading>
-        <FormControl id="position" isRequired>
-          <FormLabel>Place {column}...</FormLabel>
-          <MultiSelect
-            name="position"
-            placeholder="Column Position"
-            defaultValue={{
-              value: values.position,
-              label: `Before ${columns[values.position]}`,
-            }}
-            options={columns.reduce((placePositions, currCol, index) => {
-              if (currCol !== column) {
-                placePositions.push({
-                  value: index,
-                  label: `Before ${columns[index]}`,
-                });
-              }
-              return placePositions;
-            }, [])}
-            onChange={multiSelectOnchange}
+      <Stack spacing="6">
+        <Heading textAlign="center" size="xl" fontWeight="extrabold">
+          Create Post
+        </Heading>
+        <FormControl id="title">
+          <FormLabel>Title</FormLabel>
+          <Input
+            name="title"
+            type="text"
+            value={values.title}
+            onChange={onChange}
+            required
           />
         </FormControl>
-
+        <FormControl id="text">
+          <FormLabel>Body</FormLabel>
+          <Textarea name="text" value={values.text} onChange={onChange} />
+        </FormControl>
         <Button
           type="submit"
           colorScheme="green"
           size="lg"
           fontSize="md"
           isLoading={loading}
-          loadingText="Submitting"
+          loadingText="Creating..."
           spinnerPlacement="end"
         >
-          Save
+          Create Post
         </Button>
       </Stack>
     </chakra.form>
   );
 };
 
-const MOVE_COLUMN = gql`
-  mutation moveColumn($column: String!, $columnPos: Float!) {
-    moveColumn(column: $column, columnPos: $columnPos)
+const CREATE_POST = gql`
+  mutation createPost($title: String!, $text: String!) {
+    createPost(input: { title: $title, text: $text })
   }
 `;
