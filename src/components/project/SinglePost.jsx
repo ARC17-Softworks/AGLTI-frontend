@@ -377,8 +377,8 @@ export const SinglePost = ({ onClose, postId, initialRef }) => {
                 <Avatar size="sm" src={comment.user.avatar} />
                 <Text>{comment.user.name}</Text>
                 <Badge>
-                  {members.find(member => member.dev.id === post.user.id)
-                    ? members.find(member => member.dev.id === post.user.id)
+                  {members.find(member => member.dev.id === comment.user.id)
+                    ? members.find(member => member.dev.id === comment.user.id)
                         .title
                     : 'Project Owner'}
                 </Badge>
