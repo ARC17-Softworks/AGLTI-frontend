@@ -92,7 +92,7 @@ export const TasksArea = () => {
   const [commentEdit, setCommentEdit] = useState(false);
 
   const initialRef = React.useRef();
-  const [isLargerThan1280] = useMediaQuery('(min-width: 1280px)');
+  const [isLargerThan1400] = useMediaQuery('(min-width: 1400px)');
 
   const {
     isOpen: detailsIsOpen,
@@ -712,13 +712,15 @@ export const TasksArea = () => {
       </Box>
       <Box
         bg={taskBoardBg}
-        maxW={isLargerThan1280 ? 'container.xl' : 'container.lg'}
+        maxW={isLargerThan1400 ? 'container.xl' : 'container.lg'}
+        p="2"
         overflowX="auto"
         mx="auto"
       >
         <HStack spacing={12} mt={4} alignItems="start">
           {project.taskColumns.map(column => (
-            <Box key={column} minW="xs" maxW="xs">
+            <Box key={column} >
+              <Box minW="xs" maxW="xs">
               <Stack>
                 <Heading w="full" as="h2" size="md">
                   {column}
@@ -726,6 +728,7 @@ export const TasksArea = () => {
                 <Spacer />
               </Stack>
               <Divider mb="2" />
+              </Box>
               <VStack>
                 {project.tasks.reduce((taskList, task) => {
                   if (task.status === column) {
