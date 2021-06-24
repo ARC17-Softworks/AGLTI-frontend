@@ -713,21 +713,31 @@ export const TasksArea = () => {
       <Box
         bg={taskBoardBg}
         maxW={isLargerThan1400 ? 'container.xl' : 'container.lg'}
-        p="2"
+        px="2"
         overflowX="auto"
         mx="auto"
+        minH="80vh"
+        maxH="80vh"
       >
-        <HStack spacing={12} mt={4} alignItems="start">
+        <HStack spacing={12} mt={4} alignItems="start" minH="full">
           {project.taskColumns.map(column => (
-            <Box key={column} >
-              <Box minW="xs" maxW="xs">
-              <Stack>
-                <Heading w="full" as="h2" size="md">
-                  {column}
-                </Heading>
-                <Spacer />
-              </Stack>
-              <Divider mb="2" />
+            <Box key={column} minH="70vh">
+              <Box
+                bg={taskBoardBg}
+                minW="xs"
+                maxW="xs"
+                top="0"
+                position="sticky"
+                zIndex={1}
+                pt="2"
+              >
+                <Stack>
+                  <Heading w="full" as="h2" size="md">
+                    {column}
+                  </Heading>
+                  <Spacer />
+                </Stack>
+                <Divider mb="2" />
               </Box>
               <VStack>
                 {project.tasks.reduce((taskList, task) => {
