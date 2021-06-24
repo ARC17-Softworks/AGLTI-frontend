@@ -6,6 +6,7 @@ import {
   FormLabel,
   Stack,
   useToast,
+  Heading,
 } from '@chakra-ui/react';
 import { useMutation, gql } from '@apollo/client';
 import MultiSelect from '../form/MultiSelect';
@@ -68,6 +69,7 @@ export const MoveColumnForm = ({ column, columns, onClose, ...props }) => {
   return (
     <chakra.form onSubmit={onSubmit} {...props}>
       <Stack spacing="6" my="6">
+        <Heading>Move {column}?</Heading>
         <FormControl id="position" isRequired>
           <FormLabel>Place {column}...</FormLabel>
           <MultiSelect

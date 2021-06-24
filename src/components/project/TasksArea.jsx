@@ -751,7 +751,7 @@ export const TasksArea = () => {
                     {column}
                   </Heading>
                   <Spacer />
-                  {authContext.profile.projectOwner && (
+                  {authContext.profile.projectOwner && column !== 'COMPLETE' && (
                     <Menu>
                       <MenuButton
                         as={IconButton}
@@ -770,14 +770,16 @@ export const TasksArea = () => {
                         >
                           Move Column
                         </MenuItem>
-                        <MenuItem
-                          onClick={() => {
-                            setSelectedColumn(column);
-                            deleteColumnOnOpen();
-                          }}
-                        >
-                          Delete Column
-                        </MenuItem>
+                        {column !== 'TODO' && (
+                          <MenuItem
+                            onClick={() => {
+                              setSelectedColumn(column);
+                              deleteColumnOnOpen();
+                            }}
+                          >
+                            Delete Column
+                          </MenuItem>
+                        )}
                       </MenuList>
                     </Menu>
                   )}
