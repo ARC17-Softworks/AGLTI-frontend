@@ -47,6 +47,7 @@ import {
   DrawerCloseButton,
   Checkbox,
   Textarea,
+  useMediaQuery,
 } from '@chakra-ui/react';
 import {
   AddIcon,
@@ -91,6 +92,8 @@ export const TasksArea = () => {
   const [commentEdit, setCommentEdit] = useState(false);
 
   const initialRef = React.useRef();
+  const [isLargerThan1400] = useMediaQuery('(min-width: 1400px)');
+  const [heightIsLargerThan800] = useMediaQuery('(min-height: 800px)');
 
   const {
     isOpen: detailsIsOpen,
@@ -710,21 +713,33 @@ export const TasksArea = () => {
       </Box>
       <Box
         bg={taskBoardBg}
-        px="12"
-        maxW="container.xl"
+        maxW={isLargerThan1400 ? 'container.xl' : 'container.lg'}
+        px="2"
         overflowX="auto"
         mx="auto"
+        minH={heightIsLargerThan800 ? '80vh' : '75vh'}
+        maxH={heightIsLargerThan800 ? '80vh' : '75vh'}
       >
-        <HStack spacing={12} mt={4} alignItems="start">
+        <HStack spacing={12} mt={4} alignItems="start" minH="full">
           {project.taskColumns.map(column => (
-            <Box key={column} minW="xs" maxW="xs">
-              <Stack>
-                <Heading w="full" as="h2" size="md">
-                  {column}
-                </Heading>
-                <Spacer />
-              </Stack>
-              <Divider mb="2" />
+            <Box key={column} minH="70vh">
+              <Box
+                bg={taskBoardBg}
+                minW="xs"
+                maxW="xs"
+                top="0"
+                position="sticky"
+                zIndex={1}
+                pt="2"
+                mb="2"
+              >
+                <Stack>
+                  <Heading w="full" as="h2" size="md">
+                    {column}
+                  </Heading>
+                  <Spacer />
+                </Stack>
+              </Box>
               <VStack>
                 {project.tasks.reduce((taskList, task) => {
                   if (task.status === column) {
