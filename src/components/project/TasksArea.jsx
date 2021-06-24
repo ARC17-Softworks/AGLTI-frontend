@@ -167,10 +167,20 @@ export const TasksArea = () => {
     read: false,
   });
 
-  const { data } = useQuery(PROJECT_DASHBOARD_QUERY, {
-    pollInterval: 500,
-    fetchPolicy: 'no-cache',
-  });
+  const { data, startPolling, stopPolling } = useQuery(
+    PROJECT_DASHBOARD_QUERY,
+    {
+      // pollInterval: 500,
+      fetchPolicy: 'no-cache',
+    }
+  );
+
+  useEffect(() => {
+    startPolling(500);
+    return () => {
+      stopPolling();
+    };
+  }, [startPolling, stopPolling]);
 
   const [markRead] = useMutation(MARK_READ, {
     onError(err) {

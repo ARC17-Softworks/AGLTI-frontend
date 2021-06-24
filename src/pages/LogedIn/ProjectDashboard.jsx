@@ -13,6 +13,7 @@ import { InfoArea } from '../../components/project/InfoArea';
 import { OpeningsArea } from '../../components/project/OpeningsArea';
 import { MemberArea } from '../../components/project/MemberArea';
 import { TasksArea } from '../../components/project/TasksArea';
+import { ForumArea } from '../../components/project/ForumArea';
 
 export const ProjectDashboard = () => {
   const context = useContext(AuthContext);
@@ -52,6 +53,9 @@ export const ProjectDashboard = () => {
               </Route>
               <Route exact path={`${path}/members`}>
                 <MemberArea />
+              </Route>
+              <Route exact path={`${path}/forum`}>
+                <ForumArea />
               </Route>
             </Switch>
           </GridItem>
