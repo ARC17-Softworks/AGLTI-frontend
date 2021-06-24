@@ -47,6 +47,7 @@ import {
   DrawerCloseButton,
   Checkbox,
   Textarea,
+  useMediaQuery,
 } from '@chakra-ui/react';
 import {
   AddIcon,
@@ -91,6 +92,7 @@ export const TasksArea = () => {
   const [commentEdit, setCommentEdit] = useState(false);
 
   const initialRef = React.useRef();
+  const [isLargerThan1280] = useMediaQuery('(min-width: 1280px)');
 
   const {
     isOpen: detailsIsOpen,
@@ -710,8 +712,7 @@ export const TasksArea = () => {
       </Box>
       <Box
         bg={taskBoardBg}
-        px="12"
-        maxW="container.xl"
+        maxW={isLargerThan1280 ? 'container.xl' : 'container.lg'}
         overflowX="auto"
         mx="auto"
       >
