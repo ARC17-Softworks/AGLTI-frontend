@@ -74,6 +74,7 @@ export const TasksArea = () => {
 
   const dotBg = useColorModeValue('blue.400', 'blue.200');
   const cardBg = useColorModeValue('white', 'gray.700');
+  const taskBoardBg = useColorModeValue('gray.50', 'gray.900');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const labelColor = useColorModeValue('gray.200', 'gray.800');
 
@@ -707,10 +708,10 @@ export const TasksArea = () => {
         </Flex>
         <Divider />
       </Box>
-      <Box px="12" w="container.xl" overflowX="auto" mx="auto">
+      <Box bg={taskBoardBg} px="12" w="container.xl" overflowX="auto" mx="auto">
         <HStack spacing={12} mt={4} alignItems="start">
           {project.taskColumns.map(column => (
-            <Box key={column} minW="xs" w="xs">
+            <Box key={column} minW="xs" maxW="xs">
               <Stack>
                 <Heading w="full" as="h2" size="md">
                   {column}
