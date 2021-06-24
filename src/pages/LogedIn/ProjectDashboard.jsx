@@ -40,11 +40,11 @@ export const ProjectDashboard = () => {
             <ProjectDashboardSideNav />
           </GridItem>
           <GridItem>
-            <Box maxW="container.xl" px={10} pt={2} mx="auto">
-              <Switch>
-                <Route exact path={path}>
-                  <TasksArea />
-                </Route>
+            <Switch>
+              <Route exact path={path}>
+                <TasksArea />
+              </Route>
+              <Box maxW="container.xl" px={10} pt={2} mx="auto">
                 <Route exact path={`${path}/info`}>
                   <InfoArea />
                 </Route>
@@ -54,8 +54,8 @@ export const ProjectDashboard = () => {
                 <Route exact path={`${path}/members`}>
                   <MemberArea />
                 </Route>
-              </Switch>
-            </Box>
+              </Box>
+            </Switch>
           </GridItem>
         </Grid>
       </Box>

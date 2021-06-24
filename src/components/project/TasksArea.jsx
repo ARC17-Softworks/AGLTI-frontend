@@ -1,17 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
-  chakra,
-  FormControl,
-  FormLabel,
   Input,
-  Textarea,
+  InputGroup,
+  InputRightElement,
   VStack,
   Flex,
   Box,
   Text,
   Divider,
   Heading,
-  Link,
   Avatar,
   Spacer,
   Button,
@@ -40,31 +37,35 @@ import {
   LinkOverlay,
   ButtonGroup,
   ModalHeader,
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
   HStack,
   Stack,
+  Drawer,
+  DrawerBody,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  Checkbox,
+  Textarea,
 } from '@chakra-ui/react';
 import {
-  ExternalLinkIcon,
   AddIcon,
-  ArrowRightIcon,
   DeleteIcon,
-  SearchIcon,
+  EditIcon,
   CheckIcon,
-  ArrowLeftIcon,
+  HamburgerIcon,
+  CloseIcon,
 } from '@chakra-ui/icons';
-import { useQuery, useMutation, gql, NetworkStatus } from '@apollo/client';
+import { useQuery, useMutation, gql } from '@apollo/client';
 import { PROJECT_DASHBOARD_QUERY, MARK_READ } from '../../graphql';
 import { ProjectDashboardContext } from '../../context/projectDashboard';
 import { AuthContext } from '../../context/auth';
-import { Link as RouterLink, Redirect } from 'react-router-dom';
 import { Loading } from '../Loading';
 import { AddTaskForm } from './AddTaskForm';
-import { ReturnTaskForm } from './ReturnTaskForm';
+import { EditTaskForm } from './EditTaskForm';
+import { SetTaskLabelsForm } from './SetTaskLabelsForm';
+import MultiSelect from '../form/MultiSelect';
+import { AddColumnForm } from './AddColumnForm';
 
 export const TasksArea = () => {
   const authContext = useContext(AuthContext);
@@ -73,10 +74,23 @@ export const TasksArea = () => {
 
   const dotBg = useColorModeValue('blue.400', 'blue.200');
   const cardBg = useColorModeValue('white', 'gray.700');
+  const taskBoardBg = useColorModeValue('gray.50', 'gray.900');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const labelColor = useColorModeValue('gray.200', 'gray.800');
 
   const [tasksUnread, setTasksUnread] = useState([]);
-  const [clickedTaskId, setClickedTaskId] = useState('');
+  const [labelValue, setLabelValue] = useState('');
+  const [deleteLabelValue, setDeleteLabelValue] = useState('');
+  const [editTaskLabels, setEditTaskLabels] = useState(false);
+  const [checkListItem, setCheckListItem] = useState('');
+  const [checkListId, setCheckListId] = useState('');
+  const [selectedCommentId, setSelectedCommentId] = useState('');
+  const [textAreaValue, setTextAreaValue] = useState('');
+  const [editTextAreaValue, setEditTextAreaValue] = useState('');
+  const [moveTo, setMoveTo] = useState('');
+  const [commentEdit, setCommentEdit] = useState(false);
+
+  const initialRef = React.useRef();
 
   const {
     isOpen: detailsIsOpen,
@@ -91,6 +105,24 @@ export const TasksArea = () => {
   } = useDisclosure();
 
   const {
+    isOpen: addColumnIsOpen,
+    onOpen: addColumnOnOpen,
+    onClose: addColumnOnClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: moveColumnIsOpen,
+    onOpen: moveColumnOnOpen,
+    onClose: moveColumnOnClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: deleteColumnIsOpen,
+    onOpen: deleteColumnOnOpen,
+    onClose: deleteColumnOnClose,
+  } = useDisclosure();
+
+  const {
     isOpen: deleteIsOpen,
     onOpen: deleteOnOpen,
     onClose: deleteOnClose,
@@ -98,9 +130,15 @@ export const TasksArea = () => {
   const cancelRef = React.useRef();
 
   const {
-    isOpen: returnIsOpen,
-    onOpen: returnOnOpen,
-    onClose: returnOnClose,
+    isOpen: editIsOpen,
+    onOpen: editOnOpen,
+    onClose: editOnClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: labelDrawerIsOpen,
+    onOpen: labelDrawerOnOpen,
+    onClose: labelDrawerOnClose,
   } = useDisclosure();
 
   const [modalValues, setModalValues] = useState({
@@ -108,10 +146,12 @@ export const TasksArea = () => {
     title: '',
     description: '',
     dev: null,
-    note: '',
+    labels: [],
     status: '',
     startDate: Date.now(),
     dueDate: Date.now(),
+    checkList: [],
+    comments: [],
     read: false,
   });
 
@@ -155,7 +195,7 @@ export const TasksArea = () => {
     },
   });
 
-  const [pushTask, { loading: pushLoading }] = useMutation(PUSH_TASK, {
+  const [moveTask, { loading: moveTaskLoading }] = useMutation(MOVE_TASK, {
     update(proxy, result) {
       setTasksUnread([]);
     },
@@ -193,7 +233,7 @@ export const TasksArea = () => {
     },
   });
 
-  const [closeTask, { loading: closeLoading }] = useMutation(CLOSE_TASK, {
+  const [deleteTask] = useMutation(DELETE_TASK, {
     onError(err) {
       if (err.graphQLErrors[0]) {
         if (err.graphQLErrors[0].message === 'Argument Validation Error') {
@@ -228,6 +268,356 @@ export const TasksArea = () => {
     },
   });
 
+  const [closeTask, { loading: closeTaskLoading }] = useMutation(CLOSE_TASK, {
+    update(proxy, result) {
+      detailsOnClose();
+    },
+    onError(err) {
+      if (err.graphQLErrors[0]) {
+        if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+          toast({
+            title: Object.values(
+              err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                .constraints
+            )[0],
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        } else {
+          toast({
+            title: err.graphQLErrors[0].message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      } else {
+        toast({
+          title: err.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'bottom-left',
+        });
+      }
+    },
+  });
+
+  const [addLabel, { loading: addLabelLoading }] = useMutation(ADD_LABEL, {
+    update() {
+      setLabelValue('');
+    },
+    onError(err) {
+      if (err.graphQLErrors[0]) {
+        if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+          toast({
+            title: Object.values(
+              err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                .constraints
+            )[0],
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        } else {
+          toast({
+            title: err.graphQLErrors[0].message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      } else {
+        toast({
+          title: err.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'bottom-left',
+        });
+      }
+    },
+  });
+
+  const [deleteLabel, { loading: deleteLabelLoading }] = useMutation(
+    DELETE_LABEL,
+    {
+      onError(err) {
+        if (err.graphQLErrors[0]) {
+          if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+            toast({
+              title: Object.values(
+                err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                  .constraints
+              )[0],
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          } else {
+            toast({
+              title: err.graphQLErrors[0].message,
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          }
+        } else {
+          toast({
+            title: err.message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      },
+    }
+  );
+
+  const [addCheckListItem, { loading: addCheckListItemLoading }] = useMutation(
+    ADD_CHECKLIST_ITEM,
+    {
+      update() {
+        setCheckListItem('');
+      },
+      onError(err) {
+        if (err.graphQLErrors[0]) {
+          if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+            toast({
+              title: Object.values(
+                err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                  .constraints
+              )[0],
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          } else {
+            toast({
+              title: err.graphQLErrors[0].message,
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          }
+        } else {
+          toast({
+            title: err.message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      },
+    }
+  );
+
+  const [removeCheckListItem, { loading: removeCheckListItemLoading }] =
+    useMutation(REMOVE_CHECKLIST_ITEM, {
+      onError(err) {
+        if (err.graphQLErrors[0]) {
+          if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+            toast({
+              title: Object.values(
+                err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                  .constraints
+              )[0],
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          } else {
+            toast({
+              title: err.graphQLErrors[0].message,
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          }
+        } else {
+          toast({
+            title: err.message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      },
+    });
+
+  const [checkCheckListItem] = useMutation(CHECK_CHECKLIST_ITEM, {
+    onError(err) {
+      if (err.graphQLErrors[0]) {
+        if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+          toast({
+            title: Object.values(
+              err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                .constraints
+            )[0],
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        } else {
+          toast({
+            title: err.graphQLErrors[0].message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      } else {
+        toast({
+          title: err.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'bottom-left',
+        });
+      }
+    },
+  });
+
+  const [addTaskComment, { loading: addTaskCommentLoading }] = useMutation(
+    CREATE_TASK_COMMENT,
+    {
+      update() {
+        setTextAreaValue('');
+      },
+      onError(err) {
+        if (err.graphQLErrors[0]) {
+          if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+            toast({
+              title: Object.values(
+                err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                  .constraints
+              )[0],
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          } else {
+            toast({
+              title: err.graphQLErrors[0].message,
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          }
+        } else {
+          toast({
+            title: err.message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      },
+    }
+  );
+
+  const [editTaskComment, { loading: editTaskCommentLoading }] = useMutation(
+    EDIT_TASK_COMMENT,
+    {
+      update() {
+        setEditTextAreaValue('');
+        setSelectedCommentId('');
+        setCommentEdit(false);
+      },
+      onError(err) {
+        if (err.graphQLErrors[0]) {
+          if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+            toast({
+              title: Object.values(
+                err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                  .constraints
+              )[0],
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          } else {
+            toast({
+              title: err.graphQLErrors[0].message,
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          }
+        } else {
+          toast({
+            title: err.message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      },
+    }
+  );
+
+  const [deleteTaskComment, { loading: deleteTaskCommentLoading }] =
+    useMutation(DELETE_TASK_COMMENT, {
+      onError(err) {
+        if (err.graphQLErrors[0]) {
+          if (err.graphQLErrors[0].message === 'Argument Validation Error') {
+            toast({
+              title: Object.values(
+                err.graphQLErrors[0].extensions.exception.validationErrors[0]
+                  .constraints
+              )[0],
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          } else {
+            toast({
+              title: err.graphQLErrors[0].message,
+              status: 'error',
+              duration: 3000,
+              isClosable: true,
+              position: 'bottom-left',
+            });
+          }
+        } else {
+          toast({
+            title: err.message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+            position: 'bottom-left',
+          });
+        }
+      },
+    });
+
+  const multiSelectOnchange = value => {
+    setMoveTo(value.value);
+  };
+
   const project = data ? data.currentProject.project : null;
 
   useEffect(() => {
@@ -261,209 +651,177 @@ export const TasksArea = () => {
     }
   }, [project, setApplicants, authContext, setTasks, markRead, tasksUnread]);
 
+  useEffect(() => {
+    if (project && authContext.profile.activeProject && detailsIsOpen) {
+      setModalValues(project.tasks.find(task => task.id === modalValues.id));
+    }
+  }, [project, setModalValues, authContext, detailsIsOpen, modalValues]);
+
   if (!data) {
     return <Loading />;
   }
   return (
     <Box>
-      <Flex w="full" mt={4} alignItems="center">
-        <Heading pt={4} as="h1" size="2xl">
-          Tasks
-        </Heading>
-        <Spacer />
-        <Box>
-          {authContext.profile.projectOwner && (
-            <>
-              <Button
-                onClick={addOnOpen}
-                leftIcon={<AddIcon />}
-                variant="outline"
-              >
-                Add Task
-              </Button>
-              <Modal
-                isOpen={addIsOpen}
-                onClose={addOnClose}
-                size="3xl"
-                scrollBehavior="outside"
-              >
-                <ModalOverlay />
-                <ModalContent>
-                  <ModalCloseButton />
-                  <ModalBody>
-                    <AddTaskForm
-                      members={project.members}
-                      onClose={addOnClose}
-                    />
-                  </ModalBody>
-                </ModalContent>
-              </Modal>
-            </>
-          )}
-        </Box>
-      </Flex>
-      <Divider />
-      <HStack spacing={12} mt={4} alignItems="start">
-        {project.taskColumns.map(column => (
-          <VStack key={column} w="xs">
-            <Heading w="full" as="h2" size="md">
-              {column}
-            </Heading>
-            <Divider />
-            {project.tasks.reduce((taskList, task) => {
-              if (task.status === column) {
-                taskList.push(
-                  <LinkBox
-                    p="3"
-                    w="xs"
-                    h="28"
-                    rounded="lg"
-                    borderWidth="1px"
-                    borderColor={borderColor}
-                    boxShadow="xl"
-                    bg={cardBg}
-                    key={task.id}
+      <Box maxW="container.xl" px={10} pt={2} mx="auto">
+        <Flex w="full" mt={4} alignItems="center">
+          <Heading pt={4} as="h1" size="2xl">
+            Tasks
+          </Heading>
+          <Spacer />
+          <Box>
+            {authContext.profile.projectOwner && (
+              <>
+                <ButtonGroup variant="outline" spacing="3">
+                  <Button
+                    onClick={labelDrawerOnOpen}
+                    leftIcon={<HamburgerIcon />}
                   >
-                    {' '}
-                    <Flex
-                      direction="column"
-                      alignItems="start"
-                      w="full"
-                      h="full"
-                    >
-                      <LinkOverlay
-                        cursor="pointer"
-                        onClick={() => {
-                          setModalValues(task);
-                          detailsOnOpen();
-                        }}
+                    Labels
+                  </Button>
+                  <Button onClick={addColumnOnOpen} leftIcon={<AddIcon />}>
+                    Add Column
+                  </Button>
+                  <Button onClick={addOnOpen} leftIcon={<AddIcon />}>
+                    Add Task
+                  </Button>
+                </ButtonGroup>
+                <Modal
+                  isOpen={addIsOpen}
+                  onClose={addOnClose}
+                  size="3xl"
+                  scrollBehavior="outside"
+                >
+                  <ModalOverlay />
+                  <ModalContent>
+                    <ModalCloseButton />
+                    <ModalBody>
+                      <AddTaskForm
+                        members={project.members}
+                        onClose={addOnClose}
+                      />
+                    </ModalBody>
+                  </ModalContent>
+                </Modal>
+              </>
+            )}
+          </Box>
+        </Flex>
+        <Divider />
+      </Box>
+      <Box bg={taskBoardBg} px="12" w="container.xl" overflowX="auto" mx="auto">
+        <HStack spacing={12} mt={4} alignItems="start">
+          {project.taskColumns.map(column => (
+            <Box key={column} minW="xs" maxW="xs">
+              <Stack>
+                <Heading w="full" as="h2" size="md">
+                  {column}
+                </Heading>
+                <Spacer />
+              </Stack>
+              <Divider mb="2" />
+              <VStack>
+                {project.tasks.reduce((taskList, task) => {
+                  if (task.status === column) {
+                    taskList.push(
+                      <LinkBox
+                        p="3"
+                        w="xs"
+                        h="28"
+                        rounded="lg"
+                        borderWidth="1px"
+                        borderColor={borderColor}
+                        boxShadow="xl"
+                        bg={cardBg}
+                        key={task.id}
                       >
-                        <Text w="full" isTruncated fontWeight="semibold">
-                          {tasksUnread.includes(task.id) && (
-                            <>
-                              <Circle
-                                size="2"
-                                bg={dotBg}
-                                display="inline-block"
-                              />{' '}
-                            </>
-                          )}
-                          {task.title}
-                        </Text>
-                      </LinkOverlay>
-                      <Text
-                        w="full"
-                        color="gray.500"
-                        fontStyle="italic"
-                        fontSize="sm"
-                        isTruncated
-                      >
-                        {task.description}
-                      </Text>
-                      <Text w="full" fontSize="sm" fontStyle="italic">
-                        {task.startDate &&
-                          task.dueDate &&
-                          `${
-                            new Date(task.startDate)
-                              .toLocaleString('en-GB')
-                              .split(',')[0]
-                          } -  ${
-                            new Date(task.dueDate)
-                              .toLocaleString('en-GB')
-                              .split(',')[0]
-                          }`}
-                        {!task.startDate &&
-                          task.dueDate &&
-                          `Due: ${
-                            new Date(task.dueDate)
-                              .toLocaleString('en-GB')
-                              .split(',')[0]
-                          }`}
-                      </Text>
-                      <Flex w="full" flexGrow={1} alignItems="end">
-                        <Tooltip hasArrow label={task.dev.name}>
-                          <Avatar size="xs" src={task.dev.avatar} />
-                        </Tooltip>
-                        <Spacer />
-                        {!authContext.profile.projectOwner &&
-                          authContext.user.id === task.dev.id &&
-                          task.status !== 'DONE' &&
-                          task.status !== 'COMPLETE' && (
-                            <Tooltip hasArrow label="Push Task">
-                              <IconButton
-                                size="xs"
-                                icon={<ArrowRightIcon />}
-                                variant="outline"
-                                isLoading={
-                                  pushLoading && clickedTaskId === task.id
-                                }
-                                onClick={() => {
-                                  setClickedTaskId(task.id);
-                                  pushTask({ variables: { taskId: task.id } });
-                                }}
-                              />
-                            </Tooltip>
-                          )}
-                        {authContext.profile.projectOwner &&
-                          task.status !== 'COMPLETE' && (
-                            <ButtonGroup size="xs" isAttached variant="outline">
-                              {/* <Tooltip hasArrow label="Delete Task">
-                                <IconButton
-                                  colorScheme="red"
-                                  icon={<DeleteIcon />}
-                                  variant="outline"
-                                  // isLoading={
-                                  //   pushLoading && clickedTaskId === task.id
-                                  // }
-                                  onClick={deleteOnOpen}
-                                />
-                              </Tooltip> */}
-
-                              {task.status === 'DONE' && (
+                        {' '}
+                        <Flex
+                          direction="column"
+                          alignItems="start"
+                          w="full"
+                          h="full"
+                        >
+                          <LinkOverlay
+                            cursor="pointer"
+                            onClick={() => {
+                              setMoveTo('');
+                              setModalValues(task);
+                              detailsOnOpen();
+                            }}
+                          >
+                            <Text w="full" isTruncated fontWeight="semibold">
+                              {tasksUnread.includes(task.id) && (
                                 <>
-                                  <Tooltip hasArrow label="Send Task Back">
-                                    <IconButton
-                                      colorScheme="orange"
-                                      icon={<ArrowLeftIcon />}
-                                      variant="outline"
-                                      onClick={() => {
-                                        setClickedTaskId(task.id);
-                                        returnOnOpen();
-                                      }}
-                                    />
-                                  </Tooltip>
-                                  <Tooltip hasArrow label="Close Task">
-                                    <IconButton
-                                      colorScheme="green"
-                                      icon={<CheckIcon />}
-                                      variant="outline"
-                                      isLoading={
-                                        closeLoading &&
-                                        clickedTaskId === task.id
-                                      }
-                                      onClick={() => {
-                                        setClickedTaskId(task.id);
-                                        closeTask({
-                                          variables: { taskId: task.id },
-                                        });
-                                      }}
-                                    />
-                                  </Tooltip>
+                                  <Circle
+                                    size="2"
+                                    bg={dotBg}
+                                    display="inline-block"
+                                  />{' '}
                                 </>
                               )}
-                            </ButtonGroup>
+                              {task.title}
+                            </Text>
+                          </LinkOverlay>
+                          {task.labels.length > 0 && (
+                            <HStack>
+                              {' '}
+                              <Badge>{task.labels[0]}</Badge>{' '}
+                              {task.labels.length > 1 && (
+                                <Text fontSize="small" color="gray.500">
+                                  +{task.labels.length - 1}
+                                </Text>
+                              )}
+                            </HStack>
                           )}
-                      </Flex>
-                    </Flex>
-                  </LinkBox>
-                );
-              }
-              return taskList;
-            }, [])}
-          </VStack>
-        ))}
-      </HStack>
+                          <Text
+                            w="full"
+                            color="gray.500"
+                            fontStyle="italic"
+                            fontSize="sm"
+                            isTruncated
+                          >
+                            {task.description}
+                          </Text>
+
+                          <Flex w="full" flexGrow={1} alignItems="center">
+                            <Tooltip hasArrow label={task.dev.name}>
+                              <Avatar size="xs" src={task.dev.avatar} />
+                            </Tooltip>
+                            <Spacer />
+                            <Text fontSize="xs" fontStyle="italic">
+                              {task.startDate &&
+                                task.dueDate &&
+                                `${
+                                  new Date(task.startDate)
+                                    .toLocaleString('en-GB')
+                                    .split(',')[0]
+                                } -  ${
+                                  new Date(task.dueDate)
+                                    .toLocaleString('en-GB')
+                                    .split(',')[0]
+                                }`}
+                              {!task.startDate &&
+                                task.dueDate &&
+                                `Due: ${
+                                  new Date(task.dueDate)
+                                    .toLocaleString('en-GB')
+                                    .split(',')[0]
+                                }`}
+                            </Text>
+                          </Flex>
+                        </Flex>
+                      </LinkBox>
+                    );
+                  }
+                  return taskList;
+                }, [])}
+              </VStack>
+            </Box>
+          ))}
+        </HStack>
+      </Box>
       <Modal
+        initialFocusRef={initialRef}
         isOpen={detailsIsOpen}
         onClose={detailsOnClose}
         size="5xl"
@@ -471,12 +829,161 @@ export const TasksArea = () => {
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>{modalValues.title}</ModalHeader>
-          <ModalCloseButton />
+          <ModalHeader>
+            <Flex
+              w="full"
+              pr={8}
+              alignItems="start"
+              justifyContent="space-between"
+            >
+              <Heading>{modalValues.title}</Heading>
+              <Spacer />
+              {authContext.profile.projectOwner &&
+                modalValues.status !== 'COMPLETE' && (
+                  <ButtonGroup>
+                    <Tooltip hasArrow label="Mark Task Complete">
+                      <IconButton
+                        size="sm"
+                        icon={<CheckIcon />}
+                        variant="outline"
+                        colorScheme="green"
+                        onClick={() =>
+                          closeTask({ variables: { taskId: modalValues.id } })
+                        }
+                        isLoading={closeTaskLoading}
+                      />
+                    </Tooltip>
+                    <Tooltip hasArrow label="Edit Task">
+                      <IconButton
+                        size="sm"
+                        icon={<EditIcon />}
+                        variant="outline"
+                        onClick={editOnOpen}
+                      />
+                    </Tooltip>
+                    <Tooltip hasArrow label="Delete Task">
+                      <IconButton
+                        colorScheme="red"
+                        size="sm"
+                        icon={<DeleteIcon />}
+                        variant="outline"
+                        onClick={deleteOnOpen}
+                      />
+                    </Tooltip>
+                  </ButtonGroup>
+                )}
+            </Flex>
+          </ModalHeader>
+          <ModalCloseButton mt={1.5} />
           <ModalBody px={8}>
+            {modalValues.labels.length > 0 && !editTaskLabels && (
+              <Wrap mb="3">
+                {modalValues.labels.map(label => (
+                  <WrapItem key={label}>
+                    <Badge>{label}</Badge>
+                  </WrapItem>
+                ))}
+              </Wrap>
+            )}
+            {authContext.profile.projectOwner && editTaskLabels && (
+              <SetTaskLabelsForm
+                taskId={modalValues.id}
+                taskLabels={project.taskLabels}
+                labels={modalValues.labels}
+                setEditTaskLabels={setEditTaskLabels}
+              />
+            )}
+            {authContext.profile.projectOwner &&
+              modalValues.status !== 'COMPLETE' && (
+                <Button
+                  size="sm"
+                  onClick={() => setEditTaskLabels(!editTaskLabels)}
+                >
+                  {editTaskLabels ? 'Cancel' : 'Edit Labels'}
+                </Button>
+              )}
             <Text pt={2} pb={6}>
               {modalValues.description}
             </Text>
+            {modalValues.checkList.length > 0 && (
+              <VStack w="xl" mb="2" alignItems="start">
+                {modalValues.checkList.map(item => (
+                  <Stack
+                    w="full"
+                    direction="row"
+                    key={item.id}
+                    justifyContent="space-between"
+                  >
+                    <Checkbox
+                      {...(authContext.user.id !== modalValues.dev.id && {
+                        isReadOnly: true,
+                      })}
+                      isChecked={item.checked}
+                      onChange={e =>
+                        checkCheckListItem({
+                          variables: {
+                            taskId: modalValues.id,
+                            checklistId: item.id,
+                            checkState: e.target.checked,
+                          },
+                        })
+                      }
+                    >
+                      {item.description}
+                    </Checkbox>
+                    <Spacer />
+                    {authContext.profile.projectOwner &&
+                      modalValues.status !== 'COMPLETE' && (
+                        <IconButton
+                          colorScheme="red"
+                          size="sm"
+                          icon={<DeleteIcon />}
+                          variant="ghost"
+                          onClick={() => {
+                            setCheckListId(item.id);
+                            removeCheckListItem({
+                              variables: {
+                                taskId: modalValues.id,
+                                checklistId: item.id,
+                              },
+                            });
+                          }}
+                          isLoading={
+                            removeCheckListItemLoading &&
+                            item.id === checkListId
+                          }
+                        />
+                      )}
+                  </Stack>
+                ))}
+              </VStack>
+            )}
+            {authContext.profile.projectOwner &&
+              modalValues.status !== 'COMPLETE' && (
+                <InputGroup w="xl" mb="2" size="md" alignItems="center">
+                  <Input
+                    type="text"
+                    placeholder="Add Checklist item"
+                    value={checkListItem}
+                    onChange={e => setCheckListItem(e.target.value)}
+                  />
+                  <IconButton
+                    colorScheme="green"
+                    size="sm"
+                    variant="ghost"
+                    icon={<CheckIcon />}
+                    onClick={() => {
+                      addCheckListItem({
+                        variables: {
+                          taskId: modalValues.id,
+                          description: checkListItem,
+                        },
+                      });
+                    }}
+                    isLoading={addCheckListItemLoading}
+                  />
+                </InputGroup>
+              )}
             <Text fontWeight="bold" fontStyle="italic">
               Start Date:{' '}
               <Text as="span" color="gray.500">
@@ -495,19 +1002,214 @@ export const TasksArea = () => {
                   : 'N/A'}
               </Text>
             </Text>
-            {modalValues.note && (
-              <Text fontWeight="bold" fontStyle="italic">
-                Note: <Text as="span">{modalValues.note}</Text>
-              </Text>
-            )}
-            <HStack mt="4" alignItems="center">
-              <Text fontWeight="bold">Asignee: </Text>{' '}
-              {modalValues.dev && (
-                <Tooltip hasArrow label={modalValues.dev.name}>
-                  <Avatar size="sm" src={modalValues.dev.avatar} />
-                </Tooltip>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <HStack mt="4" alignItems="center">
+                <Text fontWeight="bold">Asignee: </Text>{' '}
+                {modalValues.dev && (
+                  <Tooltip hasArrow label={modalValues.dev.name}>
+                    <Avatar size="sm" src={modalValues.dev.avatar} />
+                  </Tooltip>
+                )}
+              </HStack>
+              <Spacer />
+              {modalValues.dev && authContext.user.id === modalValues.dev.id && (
+                <HStack>
+                  <Box w="sm">
+                    <MultiSelect
+                      name="userId"
+                      placeholder="Move to..."
+                      options={project.taskColumns.reduce(
+                        (columnList, column) => {
+                          if (
+                            column !== 'COMPLETE' &&
+                            column !== modalValues.status
+                          ) {
+                            columnList.push({
+                              value: column,
+                              label: column,
+                            });
+                          }
+                          return columnList;
+                        },
+                        []
+                      )}
+                      onChange={multiSelectOnchange}
+                    />
+                  </Box>
+                  <Tooltip hasArrow label="Move Task To Column">
+                    <IconButton
+                      icon={<CheckIcon />}
+                      onClick={() => {
+                        moveTask({
+                          variables: {
+                            taskId: modalValues.id,
+                            column: moveTo,
+                          },
+                        });
+                      }}
+                      isLoading={moveTaskLoading}
+                      colorScheme="green"
+                      isDisabled={moveTo.length === 0}
+                    />
+                  </Tooltip>
+                </HStack>
               )}
-            </HStack>
+            </Stack>
+            <Text pt="3" fontWeight="bold" fontSize="lg">
+              Comments
+            </Text>
+            <Divider />
+            <Textarea
+              value={textAreaValue}
+              size="sm"
+              resize="vertical"
+              ref={initialRef}
+              mt="2"
+              onChange={e => setTextAreaValue(e.target.value)}
+            />
+            <Button
+              colorScheme="green"
+              fontSize="md"
+              size="md"
+              mt="1"
+              onClick={() => {
+                addTaskComment({
+                  variables: { taskId: modalValues.id, text: textAreaValue },
+                });
+              }}
+              isLoading={addTaskCommentLoading}
+              loadingText="Saving.."
+              spinnerPlacement="end"
+            >
+              Save
+            </Button>
+
+            {modalValues.comments.length > 0 && (
+              <VStack my="5" w="full">
+                {modalValues.comments.map(comment => (
+                  <VStack w="full" key={comment.id}>
+                    <HStack w="full">
+                      <Avatar size="sm" src={comment.user.avatar} />
+                      <Text>{comment.user.name}</Text>
+                      <Badge>
+                        {comment.user.id === project.owner.id
+                          ? 'Project Owner'
+                          : project.members.find(
+                              member => member.dev.id === comment.user.id
+                            ).title}
+                      </Badge>
+                      <Text fontStyle="italic" color="gray.500">
+                        {new Date(comment.date).toLocaleString('en-GB')}{' '}
+                        {comment.edited && '(edited)'}
+                      </Text>
+                    </HStack>
+                    {commentEdit && comment.id === selectedCommentId ? (
+                      <Textarea
+                        value={editTextAreaValue}
+                        size="sm"
+                        resize="vertical"
+                        mt="2"
+                        onChange={e => setEditTextAreaValue(e.target.value)}
+                      />
+                    ) : (
+                      <Box
+                        rounded={'lg'}
+                        borderWidth="1px"
+                        borderColor="gray.500"
+                        w="full"
+                        px="3"
+                        py="2"
+                      >
+                        <Text>{comment.text}</Text>
+                      </Box>
+                    )}
+                    <ButtonGroup
+                      w="full"
+                      justifyContent="end"
+                      spacing="0.5"
+                      variant="ghost"
+                    >
+                      {commentEdit && comment.id === selectedCommentId && (
+                        <Tooltip hasArrow label="Save">
+                          <IconButton
+                            size="sm"
+                            icon={<CheckIcon />}
+                            onClick={() => {
+                              editTaskComment({
+                                variables: {
+                                  taskId: modalValues.id,
+                                  commentId: comment.id,
+                                  text: editTextAreaValue,
+                                },
+                              });
+                            }}
+                            isLoading={
+                              editTaskCommentLoading &&
+                              comment.id === selectedCommentId
+                            }
+                            colorScheme="green"
+                          />
+                        </Tooltip>
+                      )}
+                      {authContext.user.id === comment.user.id && (
+                        <Tooltip
+                          hasArrow
+                          label={commentEdit ? 'Cancel' : 'Edit'}
+                        >
+                          <IconButton
+                            size="sm"
+                            {...(commentEdit
+                              ? { icon: <CloseIcon />, colorScheme: 'orange' }
+                              : { icon: <EditIcon />, colorScheme: 'gray' })}
+                            onClick={() => {
+                              if (!commentEdit) {
+                                setCommentEdit(true);
+                                setSelectedCommentId(comment.id);
+                                setEditTextAreaValue(comment.text);
+                              } else {
+                                setCommentEdit(false);
+                                setSelectedCommentId('');
+                                setEditTextAreaValue('');
+                              }
+                              console.log(selectedCommentId);
+                              console.log(editTextAreaValue);
+                              console.log(comment);
+                            }}
+                          />
+                        </Tooltip>
+                      )}
+                      {(authContext.user.id === comment.user.id ||
+                        authContext.profile.projectOwner) && (
+                        <Tooltip hasArrow label="Delete">
+                          <IconButton
+                            colorScheme="red"
+                            size="sm"
+                            icon={<DeleteIcon />}
+                            onClick={() => {
+                              setSelectedCommentId(comment.id);
+                              deleteTaskComment({
+                                variables: {
+                                  taskId: modalValues.id,
+                                  commentId: comment.id,
+                                },
+                              });
+                            }}
+                            isLoading={
+                              deleteTaskCommentLoading &&
+                              comment.id === selectedCommentId
+                            }
+                          />
+                        </Tooltip>
+                      )}
+                    </ButtonGroup>
+                  </VStack>
+                ))}
+              </VStack>
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -533,7 +1235,9 @@ export const TasksArea = () => {
               colorScheme="red"
               fontSize="md"
               onClick={() => {
+                deleteTask({ variables: { taskId: modalValues.id } });
                 deleteOnClose();
+                detailsOnClose();
               }}
             >
               Yes
@@ -542,8 +1246,8 @@ export const TasksArea = () => {
         </AlertDialogContent>
       </AlertDialog>
       <Modal
-        isOpen={returnIsOpen}
-        onClose={returnOnClose}
+        isOpen={editIsOpen}
+        onClose={editOnClose}
         size="3xl"
         scrollBehavior="outside"
       >
@@ -551,21 +1255,173 @@ export const TasksArea = () => {
         <ModalContent>
           <ModalCloseButton />
           <ModalBody>
-            <ReturnTaskForm taskId={clickedTaskId} onClose={returnOnClose} />
+            <EditTaskForm
+              taskValues={modalValues}
+              members={project.members}
+              onClose={editOnClose}
+            />
           </ModalBody>
         </ModalContent>
       </Modal>
+      <Modal
+        isOpen={addColumnIsOpen}
+        onClose={addColumnOnClose}
+        size="3xl"
+        scrollBehavior="outside"
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          <ModalBody>
+            <AddColumnForm
+              columns={project.taskColumns}
+              onClose={addColumnOnClose}
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      <Drawer
+        isOpen={labelDrawerIsOpen}
+        placement="right"
+        onClose={labelDrawerOnClose}
+      >
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Labels</DrawerHeader>
+
+          <DrawerBody>
+            <InputGroup size="md">
+              <Input
+                type="text"
+                placeholder="Add Label"
+                value={labelValue}
+                onChange={e => setLabelValue(e.target.value)}
+              />
+              <InputRightElement>
+                <IconButton
+                  colorScheme="green"
+                  size="sm"
+                  icon={<CheckIcon />}
+                  variant="ghost"
+                  onClick={() => {
+                    addLabel({ variables: { label: labelValue } });
+                  }}
+                  isLoading={addLabelLoading}
+                />
+              </InputRightElement>
+            </InputGroup>
+            <VStack mt="6" w="full">
+              {project.taskLabels.map(label => (
+                <Box
+                  rounded={'md'}
+                  w="full"
+                  p="1"
+                  bg={labelColor}
+                  boxShadow={'2xl'}
+                  key={label}
+                >
+                  <Stack direction="row" justifyContent="space-between">
+                    <Text pl={1}>{label}</Text>
+                    <Spacer />
+                    <IconButton
+                      colorScheme="red"
+                      size="sm"
+                      icon={<DeleteIcon />}
+                      variant="ghost"
+                      onClick={() => {
+                        setDeleteLabelValue(label);
+                        deleteLabel({ variables: { label } });
+                      }}
+                      isLoading={
+                        deleteLabelLoading && label === deleteLabelValue
+                      }
+                    />
+                  </Stack>
+                </Box>
+              ))}
+            </VStack>
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
     </Box>
   );
 };
 
-const PUSH_TASK = gql`
-  mutation pushTask($taskId: String!) {
-    pushTask(taskId: $taskId)
+const MOVE_TASK = gql`
+  mutation moveTask($taskId: String!, $column: String!) {
+    moveTask(taskId: $taskId, column: $column)
   }
 `;
+
+const DELETE_TASK = gql`
+  mutation deleteTask($taskId: String!) {
+    deleteTask(taskId: $taskId)
+  }
+`;
+
 const CLOSE_TASK = gql`
   mutation closeTask($taskId: String!) {
     closeTask(taskId: $taskId)
+  }
+`;
+
+const ADD_LABEL = gql`
+  mutation addLabel($label: String!) {
+    addLabel(label: $label)
+  }
+`;
+
+const DELETE_LABEL = gql`
+  mutation deleteLabel($label: String!) {
+    deleteLabel(label: $label)
+  }
+`;
+
+const ADD_CHECKLIST_ITEM = gql`
+  mutation addCheckListItem($taskId: String!, $description: String!) {
+    addCheckListItem(taskId: $taskId, description: $description)
+  }
+`;
+
+const REMOVE_CHECKLIST_ITEM = gql`
+  mutation removeCheckListItem($taskId: String!, $checklistId: String!) {
+    removeCheckListItem(taskId: $taskId, checklistId: $checklistId)
+  }
+`;
+
+const CHECK_CHECKLIST_ITEM = gql`
+  mutation checkCheckListItem(
+    $taskId: String!
+    $checklistId: String!
+    $checkState: Boolean!
+  ) {
+    checkCheckListItem(
+      taskId: $taskId
+      checklistId: $checklistId
+      checkState: $checkState
+    )
+  }
+`;
+
+const CREATE_TASK_COMMENT = gql`
+  mutation createTaskComment($taskId: String!, $text: String!) {
+    createTaskComment(taskId: $taskId, text: $text)
+  }
+`;
+
+const EDIT_TASK_COMMENT = gql`
+  mutation editTaskComment(
+    $taskId: String!
+    $commentId: String!
+    $text: String!
+  ) {
+    editTaskComment(taskId: $taskId, commentId: $commentId, text: $text)
+  }
+`;
+
+const DELETE_TASK_COMMENT = gql`
+  mutation deleteTaskComment($taskId: String!, $commentId: String!) {
+    deleteTaskComment(taskId: $taskId, commentId: $commentId)
   }
 `;

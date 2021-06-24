@@ -1,29 +1,35 @@
 import React, { useState } from 'react';
 import {
-  Button,
+  IconButton,
   chakra,
   FormControl,
-  FormLabel,
-  Textarea,
-  Stack,
+  HStack,
   useToast,
 } from '@chakra-ui/react';
+import { CheckIcon } from '@chakra-ui/icons';
 import { useMutation, gql } from '@apollo/client';
+import MultiSelect from '../form/MultiSelect';
 
-export const ReturnTaskForm = ({ taskId, onClose, ...props }) => {
+export const SetTaskLabelsForm = ({
+  taskId,
+  taskLabels,
+  labels,
+  setEditTaskLabels,
+  ...props
+}) => {
   const [values, setValues] = useState({
-    note: '',
+    taskId,
+    labels,
   });
 
   const toast = useToast();
 
-  const [returnTask, { loading }] = useMutation(RETURN_TASK, {
+  const [setLabels, { loading }] = useMutation(SET_LABELS, {
     update(proxy, result) {
-      onClose();
+      setEditTaskLabels(false);
     },
-    variables: { ...values, taskId },
+    variables: { ...values },
     onError(err) {
-      console.log(err.networkError.result);
       if (err.graphQLErrors[0]) {
         if (err.graphQLErrors[0].message === 'Argument Validation Error') {
           toast({
@@ -57,50 +63,51 @@ export const ReturnTaskForm = ({ taskId, onClose, ...props }) => {
     },
   });
 
-  const onChange = e => {
-    setValues({ ...values, [e.target.name]: e.target.value });
-  };
-
   const multiSelectOnchange = value => {
-    setValues({ ...values, userId: value.value });
+    setValues({
+      ...values,
+      labels: value.length > 0 ? value.map(v => v.value) : value,
+    });
   };
 
   const onSubmit = e => {
     e.preventDefault();
-    returnTask();
+    setLabels();
   };
 
   return (
     <chakra.form onSubmit={onSubmit} {...props}>
-      <Stack spacing="6" my="6">
-        <FormControl id="note" isRequired>
-          <FormLabel>Note</FormLabel>
-          <Textarea
-            name="note"
-            type="text"
-            value={values.note}
-            onChange={onChange}
+      <HStack mb="2">
+        <FormControl id="labels" isRequired>
+          <MultiSelect
+            isMulti
+            name="labels"
+            placeholder="Add labels..."
+            defaultValue={labels.map(label => {
+              return { value: label, label: label };
+            })}
+            options={taskLabels.map(label => {
+              return { value: label, label: label };
+            })}
+            onChange={multiSelectOnchange}
           />
         </FormControl>
 
-        <Button
+        <IconButton
           type="submit"
+          icon={<CheckIcon />}
           colorScheme="green"
-          size="lg"
+          size="sm"
           fontSize="md"
           isLoading={loading}
-          loadingText="Submitting"
-          spinnerPlacement="end"
-        >
-          Return Task
-        </Button>
-      </Stack>
+        />
+      </HStack>
     </chakra.form>
   );
 };
 
-const RETURN_TASK = gql`
-  mutation returnTask($taskId: String!, $note: String!) {
-    returnTask(taskId: $taskId, note: $note)
+const SET_LABELS = gql`
+  mutation setTaskLabels($taskId: String!, $labels: [String]!) {
+    setTaskLabels(taskId: $taskId, labels: $labels)
   }
 `;

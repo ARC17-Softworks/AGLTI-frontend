@@ -47,6 +47,9 @@ import {
   AccordionIcon,
   HStack,
   Stack,
+  RadioGroup,
+  Radio,
+  FormHelperText,
 } from '@chakra-ui/react';
 import {
   ExternalLinkIcon,
@@ -71,6 +74,7 @@ export const OpeningsArea = ({ setDevSearch }) => {
     title: '',
     description: '',
     skills: '',
+    isPrivate: false,
   });
   const {
     isOpen: detailsIsOpen,
@@ -95,6 +99,7 @@ export const OpeningsArea = ({ setDevSearch }) => {
     skills: [],
     description: '',
     date: Date.now(),
+    isPrivate: false,
   });
 
   const dotBg = useColorModeValue('blue.400', 'blue.200');
@@ -155,12 +160,14 @@ export const OpeningsArea = ({ setDevSearch }) => {
           title: '',
           description: '',
           skills: '',
+          isPrivate: false,
         });
       },
       variables: {
         skills: positionValues.skills,
         title: positionValues.title,
         description: positionValues.description,
+        isPrivate: positionValues.isPrivate,
       },
       onError(err) {
         if (err.graphQLErrors[0]) {
@@ -204,6 +211,14 @@ export const OpeningsArea = ({ setDevSearch }) => {
   const onChange = e => {
     e.preventDefault();
     setPositionValues({ ...positionValues, [e.target.name]: e.target.value });
+  };
+
+  const setIsPrivate = value => {
+    setPositionValues({
+      ...positionValues,
+      isPrivate: value === 'true' ? true : false,
+    });
+    console.log(positionValues);
   };
 
   const onSubmit = e => {
@@ -419,6 +434,22 @@ export const OpeningsArea = ({ setDevSearch }) => {
           <ModalBody>
             <chakra.form onSubmit={onSubmit}>
               <Stack spacing="6">
+                <FormControl id="isPrivate" isRequired>
+                  <FormLabel>Private?</FormLabel>
+                  <RadioGroup
+                    onChange={setIsPrivate}
+                    value={positionValues.isPrivate}
+                  >
+                    <Stack direction="row">
+                      <Radio value={true}>True</Radio>
+                      <Radio value={false}>False</Radio>
+                    </Stack>
+                  </RadioGroup>
+                  <FormHelperText>
+                    Set to true if you dont want to recieve offers for this
+                    position
+                  </FormHelperText>
+                </FormControl>
                 <FormControl id="title" isRequired>
                   <FormLabel>Title</FormLabel>
                   <Input
@@ -488,7 +519,9 @@ export const OpeningsArea = ({ setDevSearch }) => {
                       detailsOnOpen();
                     }}
                   >
-                    <Heading fontSize={'2xl'}>{opening.position.title}</Heading>
+                    <Heading fontSize={'2xl'}>
+                      {opening.position.title}{' '}
+                    </Heading>
                   </LinkOverlay>
                   <Wrap>
                     {opening.position.skills.map(skill => (
@@ -597,6 +630,12 @@ export const OpeningsArea = ({ setDevSearch }) => {
           </ModalHeader>
           <ModalCloseButton mt={1.5} />
           <ModalBody px={8}>
+            <Text>
+              <Text as="span" fontWeight="bold">
+                Visibility:
+              </Text>{' '}
+              {modalValues.isPrivate ? 'Private' : 'Public'}
+            </Text>
             <Wrap pb="2">
               {modalValues.skills.map(skill => (
                 <WrapItem key={skill}>
@@ -890,9 +929,15 @@ const ADD_POSITION = gql`
     $title: String!
     $skills: [String!]!
     $description: String!
+    $isPrivate: Boolean!
   ) {
     addPosition(
-      input: { title: $title, skills: $skills, description: $description }
+      input: {
+        title: $title
+        skills: $skills
+        description: $description
+        isPrivate: $isPrivate
+      }
     )
   }
 `;

@@ -16,19 +16,24 @@ import { useMutation, gql } from '@apollo/client';
 import MultiSelect from '../form/MultiSelect';
 import DatePicker from '../form/DatePicker';
 
-export const AddTaskForm = ({ members, onClose, ...props }) => {
+export const EditTaskForm = ({ taskValues, members, onClose, ...props }) => {
   const [values, setValues] = useState({
-    userId: '',
-    title: '',
-    description: '',
+    taskId: taskValues.id,
+    userId: taskValues.dev.id,
+    title: taskValues.title,
+    description: taskValues.description,
   });
 
-  const [startDate, setStartDate] = useState(new Date());
-  const [dueDate, setDueDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(
+    taskValues.startDate ? new Date(taskValues.startDate) : null
+  );
+  const [dueDate, setDueDate] = useState(
+    taskValues.dueDate ? new Date(taskValues.dueDate) : null
+  );
 
   const toast = useToast();
 
-  const [addTask, { loading }] = useMutation(ADD_TASK, {
+  const [editTask, { loading }] = useMutation(EDIT_TASK, {
     update(proxy, result) {
       onClose();
     },
@@ -77,7 +82,7 @@ export const AddTaskForm = ({ members, onClose, ...props }) => {
 
   const onSubmit = e => {
     e.preventDefault();
-    addTask();
+    editTask();
   };
 
   return (
@@ -98,6 +103,23 @@ export const AddTaskForm = ({ members, onClose, ...props }) => {
           <MultiSelect
             name="userId"
             placeholder="Assign to..."
+            defaultValue={{
+              value: taskValues.dev.id,
+              label: (
+                <Text>
+                  <Avatar size="xs" src={taskValues.dev.avatar} />{' '}
+                  {taskValues.dev.name}{' '}
+                  <Text as="span" color="gray.500">
+                    {' '}
+                    {
+                      members.find(
+                        member => member.dev.id === taskValues.dev.id
+                      ).title
+                    }
+                  </Text>
+                </Text>
+              ),
+            }}
             options={members.map(member => {
               return {
                 value: member.dev.id,
@@ -133,7 +155,8 @@ export const AddTaskForm = ({ members, onClose, ...props }) => {
             <DatePicker
               name="startDate"
               dateFormat="dd/MM/yyyy"
-              selectedDate={startDate}
+              {...(startDate && { selectedDate: startDate })}
+              // selectedDate={startDate}
               isClearable={true}
               onChange={date => setStartDate(date)}
             />
@@ -144,7 +167,8 @@ export const AddTaskForm = ({ members, onClose, ...props }) => {
             <DatePicker
               name="dueDate"
               dateFormat="dd/MM/yyyy"
-              selectedDate={dueDate}
+              {...(dueDate && { selectedDate: dueDate })}
+              // selectedDate={dueDate}
               onChange={date => setDueDate(date)}
               isClearable={true}
             />
@@ -161,22 +185,24 @@ export const AddTaskForm = ({ members, onClose, ...props }) => {
           loadingText="Submitting"
           spinnerPlacement="end"
         >
-          Add Task
+          Save
         </Button>
       </Stack>
     </chakra.form>
   );
 };
 
-const ADD_TASK = gql`
-  mutation assignTask(
+const EDIT_TASK = gql`
+  mutation editTask(
+    $taskId: String!
     $userId: String!
     $title: String!
     $description: String!
     $startDate: DateTime
     $dueDate: DateTime
   ) {
-    assignTask(
+    editTask(
+      taskId: $taskId
       input: {
         userId: $userId
         title: $title

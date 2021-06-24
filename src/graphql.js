@@ -214,6 +214,7 @@ export const PROJECT_DASHBOARD_QUERY = gql`
             description
             skills
             date
+            isPrivate
           }
         }
         applicants {
@@ -255,6 +256,7 @@ export const PROJECT_DASHBOARD_QUERY = gql`
           title
           skills
         }
+        taskLabels
         taskColumns
         tasks {
           id
@@ -265,11 +267,27 @@ export const PROJECT_DASHBOARD_QUERY = gql`
           }
           title
           description
-          note
           status
+          labels
+          checkList {
+            id
+            description
+            checked
+          }
           startDate
           dueDate
           read
+          comments {
+            id
+            user {
+              id
+              name
+              avatar
+            }
+            text
+            edited
+            date
+          }
         }
         createdAt
       }
