@@ -14,6 +14,7 @@ import {
   MenuItem,
   MenuDivider,
   useToast,
+  Portal,
 } from '@chakra-ui/react';
 import { House } from 'phosphor-react';
 import { Link as RouterLink } from 'react-router-dom';
@@ -107,20 +108,22 @@ export const SignedInNav = () => {
             >
               <Avatar size="sm" src={context.user.avatar} />
             </MenuButton>
-            <MenuList>
-              <MenuGroup title={context.user.name}>
-                <MenuItem as={RouterLink} to={`/user/${context.user.id}`}>
-                  My Profile
-                </MenuItem>
-              </MenuGroup>
-              <MenuDivider />
-              <MenuGroup>
-                <MenuItem as={RouterLink} to="/user/changepassword">
-                  Change Password
-                </MenuItem>
-                <MenuItem onClick={() => logoutUser()}>Logout</MenuItem>
-              </MenuGroup>
-            </MenuList>
+            <Portal>
+              <MenuList>
+                <MenuGroup title={context.user.name}>
+                  <MenuItem as={RouterLink} to={`/user/${context.user.id}`}>
+                    My Profile
+                  </MenuItem>
+                </MenuGroup>
+                <MenuDivider />
+                <MenuGroup>
+                  <MenuItem as={RouterLink} to="/user/changepassword">
+                    Change Password
+                  </MenuItem>
+                  <MenuItem onClick={() => logoutUser()}>Logout</MenuItem>
+                </MenuGroup>
+              </MenuList>
+            </Portal>
           </Menu>
         </HStack>
       </Flex>
