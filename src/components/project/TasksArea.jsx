@@ -93,6 +93,7 @@ export const TasksArea = () => {
 
   const initialRef = React.useRef();
   const [isLargerThan1400] = useMediaQuery('(min-width: 1400px)');
+  const [heightIsLargerThan800] = useMediaQuery('(min-height: 800px)');
 
   const {
     isOpen: detailsIsOpen,
@@ -716,8 +717,8 @@ export const TasksArea = () => {
         px="2"
         overflowX="auto"
         mx="auto"
-        minH="80vh"
-        maxH="80vh"
+        minH={heightIsLargerThan800 ? '80vh' : '75vh'}
+        maxH={heightIsLargerThan800 ? '80vh' : '75vh'}
       >
         <HStack spacing={12} mt={4} alignItems="start" minH="full">
           {project.taskColumns.map(column => (
@@ -730,6 +731,7 @@ export const TasksArea = () => {
                 position="sticky"
                 zIndex={1}
                 pt="2"
+                mb="2"
               >
                 <Stack>
                   <Heading w="full" as="h2" size="md">
@@ -737,7 +739,6 @@ export const TasksArea = () => {
                   </Heading>
                   <Spacer />
                 </Stack>
-                <Divider mb="2" />
               </Box>
               <VStack>
                 {project.tasks.reduce((taskList, task) => {
