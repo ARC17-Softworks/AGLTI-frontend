@@ -418,134 +418,256 @@ export const OpeningsArea = ({ setDevSearch }) => {
   }
 
   return (
-    <VStack w="full" p={'6'}>
-      <Flex w="full">
-        <Text fontSize="5xl">Open Positions</Text>
-        <Spacer />
-        <Tooltip hasArrow label="Add Position">
-          <IconButton onClick={onOpen} icon={<AddIcon />} variant="outline" />
-        </Tooltip>
-      </Flex>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add Position</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <chakra.form onSubmit={onSubmit}>
-              <Stack spacing="6">
-                <FormControl id="isPrivate" isRequired>
-                  <FormLabel>Private?</FormLabel>
-                  <RadioGroup
-                    onChange={setIsPrivate}
-                    value={positionValues.isPrivate}
-                  >
-                    <Stack direction="row">
-                      <Radio value={true}>True</Radio>
-                      <Radio value={false}>False</Radio>
-                    </Stack>
-                  </RadioGroup>
-                  <FormHelperText>
-                    Set to true if you dont want to recieve offers for this
-                    position
-                  </FormHelperText>
-                </FormControl>
-                <FormControl id="title" isRequired>
-                  <FormLabel>Title</FormLabel>
-                  <Input
-                    name="title"
-                    type="text"
-                    value={positionValues.title}
-                    onChange={onChange}
-                  />
-                </FormControl>
-                <FormControl id="skills" isRequired>
-                  <FormLabel>Skills</FormLabel>
-                  <MultiSelect
-                    name="skills"
-                    options={skillsList}
-                    isMulti
-                    placeholder="Select skills required for position"
-                    closeMenuOnSelect={false}
-                    onChange={multiSelectOnchange}
-                  />
-                </FormControl>
-                <FormControl id="description" isRequired>
-                  <FormLabel>Description</FormLabel>
-                  <Textarea
-                    name="description"
-                    type="text"
-                    value={positionValues.description}
-                    onChange={onChange}
-                  />
-                </FormControl>
+    <Box maxW="container.xl" px={10} pt={2} mx="auto">
+      <VStack w="full" p={'6'}>
+        <Flex w="full">
+          <Text fontSize="5xl">Open Positions</Text>
+          <Spacer />
+          <Tooltip hasArrow label="Add Position">
+            <IconButton onClick={onOpen} icon={<AddIcon />} variant="outline" />
+          </Tooltip>
+        </Flex>
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Add Position</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <chakra.form onSubmit={onSubmit}>
+                <Stack spacing="6">
+                  <FormControl id="isPrivate" isRequired>
+                    <FormLabel>Private?</FormLabel>
+                    <RadioGroup
+                      onChange={setIsPrivate}
+                      value={positionValues.isPrivate}
+                    >
+                      <Stack direction="row">
+                        <Radio value={true}>True</Radio>
+                        <Radio value={false}>False</Radio>
+                      </Stack>
+                    </RadioGroup>
+                    <FormHelperText>
+                      Set to true if you dont want to recieve offers for this
+                      position
+                    </FormHelperText>
+                  </FormControl>
+                  <FormControl id="title" isRequired>
+                    <FormLabel>Title</FormLabel>
+                    <Input
+                      name="title"
+                      type="text"
+                      value={positionValues.title}
+                      onChange={onChange}
+                    />
+                  </FormControl>
+                  <FormControl id="skills" isRequired>
+                    <FormLabel>Skills</FormLabel>
+                    <MultiSelect
+                      name="skills"
+                      options={skillsList}
+                      isMulti
+                      placeholder="Select skills required for position"
+                      closeMenuOnSelect={false}
+                      onChange={multiSelectOnchange}
+                    />
+                  </FormControl>
+                  <FormControl id="description" isRequired>
+                    <FormLabel>Description</FormLabel>
+                    <Textarea
+                      name="description"
+                      type="text"
+                      value={positionValues.description}
+                      onChange={onChange}
+                    />
+                  </FormControl>
 
-                <Button
-                  type="submit"
-                  colorScheme="green"
-                  size="lg"
-                  fontSize="md"
-                  isLoading={addPositionLoading}
-                  loadingText="Adding..."
-                  spinnerPlacement="end"
+                  <Button
+                    type="submit"
+                    colorScheme="green"
+                    size="lg"
+                    fontSize="md"
+                    isLoading={addPositionLoading}
+                    loadingText="Adding..."
+                    spinnerPlacement="end"
+                  >
+                    Add Position
+                  </Button>
+                </Stack>
+              </chakra.form>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+        <Divider />
+        <Wrap>
+          {project.openings.length > 0 ? (
+            project.openings.map(opening => (
+              <WrapItem key={opening.position.id}>
+                <LinkBox
+                  maxW={'320px'}
+                  w={'full'}
+                  h={'full'}
+                  bg={cardBg}
+                  boxShadow={'2xl'}
+                  rounded={'lg'}
+                  p={6}
+                  textAlign={'center'}
                 >
-                  Add Position
-                </Button>
-              </Stack>
-            </chakra.form>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-      <Divider />
-      <Wrap>
-        {project.openings.length > 0 ? (
-          project.openings.map(opening => (
-            <WrapItem key={opening.position.id}>
-              <LinkBox
-                maxW={'320px'}
-                w={'full'}
-                h={'full'}
-                bg={cardBg}
-                boxShadow={'2xl'}
-                rounded={'lg'}
-                p={6}
-                textAlign={'center'}
+                  <VStack h={'full'}>
+                    <LinkOverlay
+                      cursor="pointer"
+                      onClick={() => {
+                        setModalValues(opening.position);
+                        detailsOnOpen();
+                      }}
+                    >
+                      <Heading fontSize={'2xl'}>
+                        {opening.position.title}{' '}
+                      </Heading>
+                    </LinkOverlay>
+                    <Wrap>
+                      {opening.position.skills.map(skill => (
+                        <WrapItem key={skill}>
+                          <Badge>{skill}</Badge>
+                        </WrapItem>
+                      ))}
+                    </Wrap>
+                    <Flex
+                      direction="column"
+                      justifyContent="space-between"
+                      h={'full'}
+                    >
+                      <Text noOfLines={3} mb={4}>
+                        {opening.position.description}
+                      </Text>
+                      <Spacer />
+                      <VStack>
+                        <Divider />
+                        <Text mb={4}>
+                          {project.applicants.some(
+                            applicant =>
+                              applicant.read === false &&
+                              applicant.position.id === opening.position.id
+                          ) && (
+                            <>
+                              <Circle
+                                size="2"
+                                bg={dotBg}
+                                display="inline-block"
+                              />{' '}
+                            </>
+                          )}
+                          Applicants:{' '}
+                          {
+                            project.applicants.filter(
+                              applicant =>
+                                applicant.position.id === opening.position.id
+                            ).length
+                          }
+                        </Text>
+                        <Divider />
+                        <Text mb={4}>
+                          Offered to:{' '}
+                          {
+                            project.offered.filter(
+                              offer => offer.position.id === opening.position.id
+                            ).length
+                          }
+                        </Text>
+                        <Divider />
+                        <Button
+                          leftIcon={<SearchIcon />}
+                          colorScheme="blue"
+                          size="lg"
+                          fontSize="md"
+                          variant="outline"
+                          w="full"
+                          onClick={() => setDevSearch(opening.position.id)}
+                        >
+                          Search for Developer
+                        </Button>
+                      </VStack>
+                    </Flex>
+                  </VStack>
+                </LinkBox>
+              </WrapItem>
+            ))
+          ) : (
+            <WrapItem>
+              <Text>Add positions to get people into your project.</Text>
+            </WrapItem>
+          )}
+        </Wrap>
+        <Modal
+          isOpen={detailsIsOpen}
+          initialFocusRef={initialRef}
+          onClose={detailsOnClose}
+          size="5xl"
+          scrollBehavior="inside"
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>
+              <Flex
+                w="full"
+                pr={8}
+                alignItems="start"
+                justifyContent="space-between"
               >
-                <VStack h={'full'}>
-                  <LinkOverlay
-                    cursor="pointer"
-                    onClick={() => {
-                      setModalValues(opening.position);
-                      detailsOnOpen();
-                    }}
-                  >
-                    <Heading fontSize={'2xl'}>
-                      {opening.position.title}{' '}
-                    </Heading>
-                  </LinkOverlay>
-                  <Wrap>
-                    {opening.position.skills.map(skill => (
-                      <WrapItem key={skill}>
-                        <Badge>{skill}</Badge>
-                      </WrapItem>
-                    ))}
-                  </Wrap>
-                  <Flex
-                    direction="column"
-                    justifyContent="space-between"
-                    h={'full'}
-                  >
-                    <Text noOfLines={3} mb={4}>
-                      {opening.position.description}
-                    </Text>
-                    <Spacer />
-                    <VStack>
-                      <Divider />
-                      <Text mb={4}>
+                <Heading>{modalValues.title}</Heading>
+                <Spacer />
+                <ButtonGroup>
+                  <Tooltip hasArrow label="Delete Position">
+                    <IconButton
+                      icon={<DeleteIcon />}
+                      colorScheme="red"
+                      isLoading={deleteLoading}
+                      variant="outline"
+                      size="sm"
+                      onClick={deleteOnOpen}
+                    />
+                  </Tooltip>
+                </ButtonGroup>
+              </Flex>
+            </ModalHeader>
+            <ModalCloseButton mt={1.5} />
+            <ModalBody px={8}>
+              <Text>
+                <Text as="span" fontWeight="bold">
+                  Visibility:
+                </Text>{' '}
+                {modalValues.isPrivate ? 'Private' : 'Public'}
+              </Text>
+              <Wrap pb="2">
+                {modalValues.skills.map(skill => (
+                  <WrapItem key={skill}>
+                    <Badge>{skill}</Badge>
+                  </WrapItem>
+                ))}
+              </Wrap>
+
+              <Text pt={2} pb={6}>
+                {modalValues.description}
+              </Text>
+              <Button
+                leftIcon={<SearchIcon />}
+                colorScheme="blue"
+                size="lg"
+                fontSize="md"
+                variant="outline"
+                ref={initialRef}
+                onClick={() => setDevSearch(modalValues.id)}
+              >
+                Search for Developer
+              </Button>
+              <Accordion defaultIndex={[0, 1]} allowMultiple mt={4}>
+                <AccordionItem>
+                  <h2>
+                    <AccordionButton>
+                      <Box flex="1" textAlign="left">
                         {project.applicants.some(
                           applicant =>
                             applicant.read === false &&
-                            applicant.position.id === opening.position.id
+                            applicant.position.id === modalValues.id
                         ) && (
                           <>
                             <Circle
@@ -559,344 +681,235 @@ export const OpeningsArea = ({ setDevSearch }) => {
                         {
                           project.applicants.filter(
                             applicant =>
-                              applicant.position.id === opening.position.id
+                              applicant.position.id === modalValues.id
                           ).length
                         }
-                      </Text>
-                      <Divider />
-                      <Text mb={4}>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                  </h2>
+                  <AccordionPanel pb={4}>
+                    {project.applicants.length > 0 &&
+                    project.applicants.some(
+                      applicant => applicant.position.id === modalValues.id
+                    ) ? (
+                      project.applicants.reduce((boxes, applicant) => {
+                        if (applicant.position.id === modalValues.id) {
+                          boxes.push(
+                            <Box
+                              key={applicant.dev.id}
+                              w="full"
+                              p="3"
+                              my="1"
+                              borderWidth="1px"
+                              rounded="md"
+                            >
+                              <Flex
+                                direction="row"
+                                justifyContent="space-between"
+                              >
+                                <HStack>
+                                  <Avatar
+                                    size="sm"
+                                    src={applicant.dev.avatar}
+                                  />
+                                  <Link
+                                    isExternal
+                                    as={RouterLink}
+                                    fontWeight="bold"
+                                    to={`/user/${applicant.dev.id}`}
+                                  >
+                                    {applicant.read === false && (
+                                      <>
+                                        <Circle
+                                          size="2"
+                                          bg={dotBg}
+                                          display="inline-block"
+                                        />{' '}
+                                      </>
+                                    )}
+                                    {applicant.dev.name}{' '}
+                                    <ExternalLinkIcon mx="2px" />
+                                  </Link>
+                                </HStack>{' '}
+                                <Spacer />
+                                <ButtonGroup spacing="0.5">
+                                  <Button
+                                    colorScheme="green"
+                                    isLoading={
+                                      devId === applicant.dev.id &&
+                                      acceptLoading
+                                    }
+                                    loadingText="Accepting..."
+                                    spinnerPlacement="end"
+                                    mr={3}
+                                    onClick={() => {
+                                      setDevId(applicant.dev.id);
+                                      acceptApplication({
+                                        variables: {
+                                          userId: applicant.dev.id,
+                                          positionId: applicant.position.id,
+                                        },
+                                      });
+                                    }}
+                                  >
+                                    Accept
+                                  </Button>
+                                  <Button
+                                    colorScheme="red"
+                                    isLoading={
+                                      devId === applicant.dev.id &&
+                                      rejectLoading
+                                    }
+                                    loadingText="Rejecting..."
+                                    spinnerPlacement="end"
+                                    mr={3}
+                                    onClick={() => {
+                                      setDevId(applicant.dev.id);
+                                      rejectApplication({
+                                        variables: {
+                                          userId: applicant.dev.id,
+                                          positionId: applicant.position.id,
+                                        },
+                                      });
+                                    }}
+                                  >
+                                    Reject
+                                  </Button>
+                                </ButtonGroup>{' '}
+                              </Flex>
+                            </Box>
+                          );
+                        }
+                        return boxes;
+                      }, [])
+                    ) : (
+                      <Text>No applicants yet</Text>
+                    )}
+                  </AccordionPanel>
+                </AccordionItem>
+
+                <AccordionItem>
+                  <h2>
+                    <AccordionButton>
+                      <Box flex="1" textAlign="left">
                         Offered to:{' '}
                         {
                           project.offered.filter(
-                            offer => offer.position.id === opening.position.id
+                            offer => offer.position.id === modalValues.id
                           ).length
                         }
-                      </Text>
-                      <Divider />
-                      <Button
-                        leftIcon={<SearchIcon />}
-                        colorScheme="blue"
-                        size="lg"
-                        fontSize="md"
-                        variant="outline"
-                        w="full"
-                        onClick={() => setDevSearch(opening.position.id)}
-                      >
-                        Search for Developer
-                      </Button>
-                    </VStack>
-                  </Flex>
-                </VStack>
-              </LinkBox>
-            </WrapItem>
-          ))
-        ) : (
-          <WrapItem>
-            <Text>Add positions to get people into your project.</Text>
-          </WrapItem>
-        )}
-      </Wrap>
-      <Modal
-        isOpen={detailsIsOpen}
-        initialFocusRef={initialRef}
-        onClose={detailsOnClose}
-        size="5xl"
-        scrollBehavior="inside"
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>
-            <Flex
-              w="full"
-              pr={8}
-              alignItems="start"
-              justifyContent="space-between"
-            >
-              <Heading>{modalValues.title}</Heading>
-              <Spacer />
-              <ButtonGroup>
-                <Tooltip hasArrow label="Delete Position">
-                  <IconButton
-                    icon={<DeleteIcon />}
-                    colorScheme="red"
-                    isLoading={deleteLoading}
-                    variant="outline"
-                    size="sm"
-                    onClick={deleteOnOpen}
-                  />
-                </Tooltip>
-              </ButtonGroup>
-            </Flex>
-          </ModalHeader>
-          <ModalCloseButton mt={1.5} />
-          <ModalBody px={8}>
-            <Text>
-              <Text as="span" fontWeight="bold">
-                Visibility:
-              </Text>{' '}
-              {modalValues.isPrivate ? 'Private' : 'Public'}
-            </Text>
-            <Wrap pb="2">
-              {modalValues.skills.map(skill => (
-                <WrapItem key={skill}>
-                  <Badge>{skill}</Badge>
-                </WrapItem>
-              ))}
-            </Wrap>
-
-            <Text pt={2} pb={6}>
-              {modalValues.description}
-            </Text>
-            <Button
-              leftIcon={<SearchIcon />}
-              colorScheme="blue"
-              size="lg"
-              fontSize="md"
-              variant="outline"
-              ref={initialRef}
-              onClick={() => setDevSearch(modalValues.id)}
-            >
-              Search for Developer
-            </Button>
-            <Accordion defaultIndex={[0, 1]} allowMultiple mt={4}>
-              <AccordionItem>
-                <h2>
-                  <AccordionButton>
-                    <Box flex="1" textAlign="left">
-                      {project.applicants.some(
-                        applicant =>
-                          applicant.read === false &&
-                          applicant.position.id === modalValues.id
-                      ) && (
-                        <>
-                          <Circle size="2" bg={dotBg} display="inline-block" />{' '}
-                        </>
-                      )}
-                      Applicants:{' '}
-                      {
-                        project.applicants.filter(
-                          applicant => applicant.position.id === modalValues.id
-                        ).length
-                      }
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                  {project.applicants.length > 0 &&
-                  project.applicants.some(
-                    applicant => applicant.position.id === modalValues.id
-                  ) ? (
-                    project.applicants.reduce((boxes, applicant) => {
-                      if (applicant.position.id === modalValues.id) {
-                        boxes.push(
-                          <Box
-                            key={applicant.dev.id}
-                            w="full"
-                            p="3"
-                            my="1"
-                            borderWidth="1px"
-                            rounded="md"
-                          >
-                            <Flex
-                              direction="row"
-                              justifyContent="space-between"
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                  </h2>
+                  <AccordionPanel pb={4}>
+                    {project.offered.length > 0 &&
+                    project.offered.some(
+                      offer => offer.position.id === modalValues.id
+                    ) ? (
+                      project.offered.reduce((boxes, offer) => {
+                        if (offer.position.id === modalValues.id) {
+                          boxes.push(
+                            <Box
+                              key={offer.dev.id}
+                              w="full"
+                              p="3"
+                              my="1"
+                              borderWidth="1px"
+                              rounded="md"
                             >
-                              <HStack>
-                                <Avatar size="sm" src={applicant.dev.avatar} />
-                                <Link
-                                  isExternal
-                                  as={RouterLink}
-                                  fontWeight="bold"
-                                  to={`/user/${applicant.dev.id}`}
-                                >
-                                  {applicant.read === false && (
-                                    <>
-                                      <Circle
-                                        size="2"
-                                        bg={dotBg}
-                                        display="inline-block"
-                                      />{' '}
-                                    </>
-                                  )}
-                                  {applicant.dev.name}{' '}
-                                  <ExternalLinkIcon mx="2px" />
-                                </Link>
-                              </HStack>{' '}
-                              <Spacer />
-                              <ButtonGroup spacing="0.5">
-                                <Button
-                                  colorScheme="green"
-                                  isLoading={
-                                    devId === applicant.dev.id && acceptLoading
-                                  }
-                                  loadingText="Accepting..."
-                                  spinnerPlacement="end"
-                                  mr={3}
-                                  onClick={() => {
-                                    setDevId(applicant.dev.id);
-                                    acceptApplication({
-                                      variables: {
-                                        userId: applicant.dev.id,
-                                        positionId: applicant.position.id,
-                                      },
-                                    });
-                                  }}
-                                >
-                                  Accept
-                                </Button>
-                                <Button
-                                  colorScheme="red"
-                                  isLoading={
-                                    devId === applicant.dev.id && rejectLoading
-                                  }
-                                  loadingText="Rejecting..."
-                                  spinnerPlacement="end"
-                                  mr={3}
-                                  onClick={() => {
-                                    setDevId(applicant.dev.id);
-                                    rejectApplication({
-                                      variables: {
-                                        userId: applicant.dev.id,
-                                        positionId: applicant.position.id,
-                                      },
-                                    });
-                                  }}
-                                >
-                                  Reject
-                                </Button>
-                              </ButtonGroup>{' '}
-                            </Flex>
-                          </Box>
-                        );
-                      }
-                      return boxes;
-                    }, [])
-                  ) : (
-                    <Text>No applicants yet</Text>
-                  )}
-                </AccordionPanel>
-              </AccordionItem>
-
-              <AccordionItem>
-                <h2>
-                  <AccordionButton>
-                    <Box flex="1" textAlign="left">
-                      Offered to:{' '}
-                      {
-                        project.offered.filter(
-                          offer => offer.position.id === modalValues.id
-                        ).length
-                      }
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                  {project.offered.length > 0 &&
-                  project.offered.some(
-                    offer => offer.position.id === modalValues.id
-                  ) ? (
-                    project.offered.reduce((boxes, offer) => {
-                      if (offer.position.id === modalValues.id) {
-                        boxes.push(
-                          <Box
-                            key={offer.dev.id}
-                            w="full"
-                            p="3"
-                            my="1"
-                            borderWidth="1px"
-                            rounded="md"
-                          >
-                            <Flex
-                              direction="row"
-                              justifyContent="space-between"
-                            >
-                              <HStack>
-                                <Avatar size="sm" src={offer.dev.avatar} />
-                                <Link
-                                  isExternal
-                                  as={RouterLink}
-                                  fontWeight="bold"
-                                  to={`/user/${offer.dev.id}`}
-                                >
-                                  {offer.dev.name} <ExternalLinkIcon mx="2px" />
-                                </Link>
-                              </HStack>{' '}
-                              <Spacer />
-                              <Button
-                                colorScheme="gray"
-                                variant="outline"
-                                isLoading={
-                                  devId === offer.dev.id && cancelLoading
-                                }
-                                loadingText="Cancelling..."
-                                spinnerPlacement="end"
-                                mr={3}
-                                onClick={() => {
-                                  setDevId(offer.dev.id);
-                                  cancelOffer({
-                                    variables: {
-                                      userId: offer.dev.id,
-                                      positionId: offer.position.id,
-                                    },
-                                  });
-                                }}
+                              <Flex
+                                direction="row"
+                                justifyContent="space-between"
                               >
-                                Cancel Offer
-                              </Button>
-                            </Flex>
-                          </Box>
-                        );
-                      }
-                      return boxes;
-                    }, [])
-                  ) : (
-                    <Text>You have not offered anyone this position yet</Text>
-                  )}
-                </AccordionPanel>
-              </AccordionItem>
-            </Accordion>
-          </ModalBody>
-        </ModalContent>
-        <AlertDialog
-          motionPreset="slideInBottom"
-          leastDestructiveRef={cancelRef}
-          onClose={deleteOnClose}
-          isOpen={deleteIsOpen}
-          isCentered
-        >
-          <AlertDialogOverlay />
+                                <HStack>
+                                  <Avatar size="sm" src={offer.dev.avatar} />
+                                  <Link
+                                    isExternal
+                                    as={RouterLink}
+                                    fontWeight="bold"
+                                    to={`/user/${offer.dev.id}`}
+                                  >
+                                    {offer.dev.name}{' '}
+                                    <ExternalLinkIcon mx="2px" />
+                                  </Link>
+                                </HStack>{' '}
+                                <Spacer />
+                                <Button
+                                  colorScheme="gray"
+                                  variant="outline"
+                                  isLoading={
+                                    devId === offer.dev.id && cancelLoading
+                                  }
+                                  loadingText="Cancelling..."
+                                  spinnerPlacement="end"
+                                  mr={3}
+                                  onClick={() => {
+                                    setDevId(offer.dev.id);
+                                    cancelOffer({
+                                      variables: {
+                                        userId: offer.dev.id,
+                                        positionId: offer.position.id,
+                                      },
+                                    });
+                                  }}
+                                >
+                                  Cancel Offer
+                                </Button>
+                              </Flex>
+                            </Box>
+                          );
+                        }
+                        return boxes;
+                      }, [])
+                    ) : (
+                      <Text>You have not offered anyone this position yet</Text>
+                    )}
+                  </AccordionPanel>
+                </AccordionItem>
+              </Accordion>
+            </ModalBody>
+          </ModalContent>
+          <AlertDialog
+            motionPreset="slideInBottom"
+            leastDestructiveRef={cancelRef}
+            onClose={deleteOnClose}
+            isOpen={deleteIsOpen}
+            isCentered
+          >
+            <AlertDialogOverlay />
 
-          <AlertDialogContent>
-            <AlertDialogHeader>Delete Position?</AlertDialogHeader>
-            <AlertDialogCloseButton />
-            <AlertDialogBody>
-              Are you sure you want to delete this Position?
-            </AlertDialogBody>
-            <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={deleteOnClose}>
-                No
-              </Button>
-              <Button
-                colorScheme="red"
-                fontSize="md"
-                onClick={() => {
-                  deletePosition({
-                    variables: {
-                      positionId: modalValues.id,
-                    },
-                  });
-                  deleteOnClose();
-                }}
-              >
-                Yes
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </Modal>
-    </VStack>
+            <AlertDialogContent>
+              <AlertDialogHeader>Delete Position?</AlertDialogHeader>
+              <AlertDialogCloseButton />
+              <AlertDialogBody>
+                Are you sure you want to delete this Position?
+              </AlertDialogBody>
+              <AlertDialogFooter>
+                <Button ref={cancelRef} onClick={deleteOnClose}>
+                  No
+                </Button>
+                <Button
+                  colorScheme="red"
+                  fontSize="md"
+                  onClick={() => {
+                    deletePosition({
+                      variables: {
+                        positionId: modalValues.id,
+                      },
+                    });
+                    deleteOnClose();
+                  }}
+                >
+                  Yes
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </Modal>
+      </VStack>
+    </Box>
   );
 };
 

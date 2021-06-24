@@ -44,17 +44,15 @@ export const ProjectDashboard = () => {
               <Route exact path={path}>
                 <TasksArea />
               </Route>
-              <Box maxW="container.xl" px={10} pt={2} mx="auto">
-                <Route exact path={`${path}/info`}>
-                  <InfoArea />
-                </Route>
-                <Route exact path={`${path}/openings`}>
-                  <OpeningsArea setDevSearch={setDevSearch} />
-                </Route>
-                <Route exact path={`${path}/members`}>
-                  <MemberArea />
-                </Route>
-              </Box>
+              <Route exact path={`${path}/info`}>
+                <InfoArea />
+              </Route>
+              <Route exact path={`${path}/openings`}>
+                <OpeningsArea setDevSearch={setDevSearch} />
+              </Route>
+              <Route exact path={`${path}/members`}>
+                <MemberArea />
+              </Route>
             </Switch>
           </GridItem>
         </Grid>

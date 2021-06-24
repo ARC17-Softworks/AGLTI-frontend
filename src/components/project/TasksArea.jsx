@@ -708,7 +708,13 @@ export const TasksArea = () => {
         </Flex>
         <Divider />
       </Box>
-      <Box bg={taskBoardBg} px="12" w="container.xl" overflowX="auto" mx="auto">
+      <Box
+        bg={taskBoardBg}
+        px="12"
+        maxW="container.xl"
+        overflowX="auto"
+        mx="auto"
+      >
         <HStack spacing={12} mt={4} alignItems="start">
           {project.taskColumns.map(column => (
             <Box key={column} minW="xs" maxW="xs">

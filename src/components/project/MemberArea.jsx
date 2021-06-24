@@ -60,41 +60,43 @@ export const MemberArea = () => {
   }
 
   return (
-    <VStack mt={4} alignItems="start" w="full" justify="center">
-      <Heading pt={4} as="h1" size="2xl">
-        Members
-      </Heading>
-      <Divider />
-      {project.members.length > 0 && (
-        <Box w="full">
-          <Wrap align="center" justify="center" pb="2">
-            {project.members.map(member => (
-              <WrapItem key={member.dev.id}>
-                <MemberCard
-                  refetch={refetch}
-                  dashboard={true}
-                  member={member}
-                />
-              </WrapItem>
-            ))}
-          </Wrap>
-        </Box>
-      )}
-      <Heading pt={4} as="h1" size="2xl">
-        Previous Members
-      </Heading>
-      <Divider />
-      {project.previousMembers.length > 0 && (
-        <Box w="full">
-          <Wrap align="center" justify="center" pb="2">
-            {project.previousMembers.map(member => (
-              <WrapItem key={member.dev.id}>
-                <MemberCard member={member} />
-              </WrapItem>
-            ))}
-          </Wrap>
-        </Box>
-      )}
-    </VStack>
+    <Box maxW="container.xl" px={10} pt={2} mx="auto">
+      <VStack mt={4} alignItems="start" w="full" justify="center">
+        <Heading pt={4} as="h1" size="2xl">
+          Members
+        </Heading>
+        <Divider />
+        {project.members.length > 0 && (
+          <Box w="full">
+            <Wrap align="center" justify="center" pb="2">
+              {project.members.map(member => (
+                <WrapItem key={member.dev.id}>
+                  <MemberCard
+                    refetch={refetch}
+                    dashboard={true}
+                    member={member}
+                  />
+                </WrapItem>
+              ))}
+            </Wrap>
+          </Box>
+        )}
+        <Heading pt={4} as="h1" size="2xl">
+          Previous Members
+        </Heading>
+        <Divider />
+        {project.previousMembers.length > 0 && (
+          <Box w="full">
+            <Wrap align="center" justify="center" pb="2">
+              {project.previousMembers.map(member => (
+                <WrapItem key={member.dev.id}>
+                  <MemberCard member={member} />
+                </WrapItem>
+              ))}
+            </Wrap>
+          </Box>
+        )}
+      </VStack>
+    </Box>
   );
 };
