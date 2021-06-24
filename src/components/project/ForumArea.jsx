@@ -2,16 +2,12 @@ import React, { useContext, useEffect, useState } from 'react';
 import {
   Flex,
   VStack,
-  Grid,
-  GridItem,
   Box,
   LinkBox,
   LinkOverlay,
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
   useDisclosure,
@@ -19,29 +15,30 @@ import {
   useToast,
   Text,
   Divider,
-  Checkbox,
-  CheckboxGroup,
   Heading,
   Button,
   ButtonGroup,
-  Wrap,
-  WrapItem,
   Badge,
-  Link,
   Spacer,
+  Avatar,
+  HStack,
 } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
-import { useQuery, useMutation, gql, NetworkStatus } from '@apollo/client';
-import { ProjectDashboardContext } from '../../context/projectDashboard';
+import { useQuery, gql, NetworkStatus } from '@apollo/client';
 import { AuthContext } from '../../context/auth';
 import { Loading } from '../Loading';
+import { SinglePost } from './SinglePost';
+import { CreatePostForm } from './CreatePostForm';
 
 export const ForumArea = () => {
   const authContext = useContext(AuthContext);
-  const { setApplicants, setTasks } = useContext(ProjectDashboardContext);
+  const bg = useColorModeValue('gray.50', 'gray.700');
+
+  const initialRef = React.useRef();
 
   const [page, setPage] = useState(1);
   const [buttonState, setButtonState] = useState([false, false]);
+  const [selectedPostId, setSelectedPostId] = useState('');
 
   const {
     isOpen: createIsOpen,
@@ -106,9 +103,57 @@ export const ForumArea = () => {
     return <Loading />;
   }
 
-  if (loading || networkStatus === NetworkStatus.refetch) {
-    return <Loading />;
+  if (error) {
+    toast({
+      title: error.message,
+      status: 'error',
+      duration: 3000,
+      isClosable: true,
+      position: 'bottom-left',
+    });
   }
+
+  const postList = posts && (
+    <VStack mt="2">
+      {posts.length > 0 ? (
+        posts.map(post => (
+          <LinkBox key={post.id} w="full" p="3" bg={bg} rounded="md">
+            <LinkOverlay
+              cursor="pointer"
+              onClick={() => {
+                setSelectedPostId(post.id);
+                postOnOpen();
+              }}
+            >
+              <Heading>{post.title}</Heading>
+            </LinkOverlay>
+            <Flex>
+              <HStack>
+                <Avatar size="xs" src={post.user.avatar} mb={1} />
+                <Text>{post.user.name}</Text>
+                <Badge>
+                  {members.find(member => member.dev.id === post.user.id)
+                    ? members.find(member => member.dev.id === post.user.id)
+                        .title
+                    : 'Project Owner'}
+                </Badge>
+                <Text color="gray.500">
+                  On {new Date(post.date).toLocaleString('en-GB')}
+                </Text>
+              </HStack>
+              <Spacer />
+              <Text>
+                {post.commentCount}{' '}
+                {post.commentCount === 1 ? 'comment' : 'comments'}
+              </Text>
+            </Flex>
+          </LinkBox>
+        ))
+      ) : (
+        <Text>no posts to show</Text>
+      )}
+    </VStack>
+  );
 
   return (
     <Box maxW="container.xl" px={10} pt={2} mx="auto">
@@ -126,6 +171,11 @@ export const ForumArea = () => {
         </Flex>
         <Divider />
       </Box>
+      {loading || networkStatus === NetworkStatus.refetch ? (
+        <Loading />
+      ) : (
+        postList
+      )}
       <Flex direction="row" justify="center">
         <ButtonGroup
           my="4"
@@ -142,6 +192,45 @@ export const ForumArea = () => {
           </Button>
         </ButtonGroup>
       </Flex>
+      <Modal
+        initialFocusRef={initialRef}
+        isOpen={postIsOpen}
+        onClose={() => {
+          postOnClose();
+          refetch();
+        }}
+        size="6xl"
+        scrollBehavior="inside"
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          <ModalBody>
+            <SinglePost
+              postId={selectedPostId}
+              onClose={() => {
+                postOnClose();
+                refetch();
+              }}
+              initialRef={initialRef}
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={createIsOpen}
+        onClose={createOnClose}
+        size="3xl"
+        scrollBehavior="outside"
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          <ModalBody>
+            <CreatePostForm onClose={createOnClose} refetch={refetch} />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };
@@ -166,17 +255,7 @@ const GET_POSTS = gql`
         text
         edited
         date
-        comments {
-          id
-          user {
-            id
-            name
-            avatar
-          }
-          text
-          edited
-          date
-        }
+        commentCount
       }
       pagination {
         pages
