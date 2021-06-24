@@ -65,6 +65,7 @@ import { AddTaskForm } from './AddTaskForm';
 import { EditTaskForm } from './EditTaskForm';
 import { SetTaskLabelsForm } from './SetTaskLabelsForm';
 import MultiSelect from '../form/MultiSelect';
+import { AddColumnForm } from './AddColumnForm';
 
 export const TasksArea = () => {
   const authContext = useContext(AuthContext);
@@ -100,6 +101,24 @@ export const TasksArea = () => {
     isOpen: addIsOpen,
     onOpen: addOnOpen,
     onClose: addOnClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: addColumnIsOpen,
+    onOpen: addColumnOnOpen,
+    onClose: addColumnOnClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: moveColumnIsOpen,
+    onOpen: moveColumnOnOpen,
+    onClose: moveColumnOnClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: deleteColumnIsOpen,
+    onOpen: deleteColumnOnOpen,
+    onClose: deleteColumnOnClose,
   } = useDisclosure();
 
   const {
@@ -642,152 +661,164 @@ export const TasksArea = () => {
   }
   return (
     <Box>
-      <Flex w="full" mt={4} alignItems="center">
-        <Heading pt={4} as="h1" size="2xl">
-          Tasks
-        </Heading>
-        <Spacer />
-        <Box>
-          {authContext.profile.projectOwner && (
-            <>
-              <ButtonGroup variant="outline" spacing="3">
-                <Button
-                  onClick={labelDrawerOnOpen}
-                  leftIcon={<HamburgerIcon />}
-                >
-                  Labels
-                </Button>
-                <Button onClick={addOnOpen} leftIcon={<AddIcon />}>
-                  Add Task
-                </Button>
-              </ButtonGroup>
-              <Modal
-                isOpen={addIsOpen}
-                onClose={addOnClose}
-                size="3xl"
-                scrollBehavior="outside"
-              >
-                <ModalOverlay />
-                <ModalContent>
-                  <ModalCloseButton />
-                  <ModalBody>
-                    <AddTaskForm
-                      members={project.members}
-                      onClose={addOnClose}
-                    />
-                  </ModalBody>
-                </ModalContent>
-              </Modal>
-            </>
-          )}
-        </Box>
-      </Flex>
-      <Divider />
-      <HStack spacing={12} mt={4} alignItems="start">
-        {project.taskColumns.map(column => (
-          <VStack key={column} w="xs">
-            <Heading w="full" as="h2" size="md">
-              {column}
-            </Heading>
-            <Divider />
-            {project.tasks.reduce((taskList, task) => {
-              if (task.status === column) {
-                taskList.push(
-                  <LinkBox
-                    p="3"
-                    w="xs"
-                    h="28"
-                    rounded="lg"
-                    borderWidth="1px"
-                    borderColor={borderColor}
-                    boxShadow="xl"
-                    bg={cardBg}
-                    key={task.id}
+      <Box maxW="container.xl" px={10} pt={2} mx="auto">
+        <Flex w="full" mt={4} alignItems="center">
+          <Heading pt={4} as="h1" size="2xl">
+            Tasks
+          </Heading>
+          <Spacer />
+          <Box>
+            {authContext.profile.projectOwner && (
+              <>
+                <ButtonGroup variant="outline" spacing="3">
+                  <Button
+                    onClick={labelDrawerOnOpen}
+                    leftIcon={<HamburgerIcon />}
                   >
-                    {' '}
-                    <Flex
-                      direction="column"
-                      alignItems="start"
-                      w="full"
-                      h="full"
-                    >
-                      <LinkOverlay
-                        cursor="pointer"
-                        onClick={() => {
-                          setMoveTo('');
-                          setModalValues(task);
-                          detailsOnOpen();
-                        }}
+                    Labels
+                  </Button>
+                  <Button onClick={addColumnOnOpen} leftIcon={<AddIcon />}>
+                    Add Column
+                  </Button>
+                  <Button onClick={addOnOpen} leftIcon={<AddIcon />}>
+                    Add Task
+                  </Button>
+                </ButtonGroup>
+                <Modal
+                  isOpen={addIsOpen}
+                  onClose={addOnClose}
+                  size="3xl"
+                  scrollBehavior="outside"
+                >
+                  <ModalOverlay />
+                  <ModalContent>
+                    <ModalCloseButton />
+                    <ModalBody>
+                      <AddTaskForm
+                        members={project.members}
+                        onClose={addOnClose}
+                      />
+                    </ModalBody>
+                  </ModalContent>
+                </Modal>
+              </>
+            )}
+          </Box>
+        </Flex>
+        <Divider />
+      </Box>
+      <Box px="12" w="container.xl" overflowX="auto" mx="auto">
+        <HStack spacing={12} mt={4} alignItems="start">
+          {project.taskColumns.map(column => (
+            <Box key={column} minW="xs" w="xs">
+              <Stack>
+                <Heading w="full" as="h2" size="md">
+                  {column}
+                </Heading>
+                <Spacer />
+              </Stack>
+              <Divider mb="2" />
+              <VStack>
+                {project.tasks.reduce((taskList, task) => {
+                  if (task.status === column) {
+                    taskList.push(
+                      <LinkBox
+                        p="3"
+                        w="xs"
+                        h="28"
+                        rounded="lg"
+                        borderWidth="1px"
+                        borderColor={borderColor}
+                        boxShadow="xl"
+                        bg={cardBg}
+                        key={task.id}
                       >
-                        <Text w="full" isTruncated fontWeight="semibold">
-                          {tasksUnread.includes(task.id) && (
-                            <>
-                              <Circle
-                                size="2"
-                                bg={dotBg}
-                                display="inline-block"
-                              />{' '}
-                            </>
-                          )}
-                          {task.title}
-                        </Text>
-                      </LinkOverlay>
-                      {task.labels.length > 0 && (
-                        <HStack>
-                          {' '}
-                          <Badge>{task.labels[0]}</Badge>{' '}
-                          {task.labels.length > 1 && (
-                            <Text fontSize="small" color="gray.500">
-                              +{task.labels.length - 1}
+                        {' '}
+                        <Flex
+                          direction="column"
+                          alignItems="start"
+                          w="full"
+                          h="full"
+                        >
+                          <LinkOverlay
+                            cursor="pointer"
+                            onClick={() => {
+                              setMoveTo('');
+                              setModalValues(task);
+                              detailsOnOpen();
+                            }}
+                          >
+                            <Text w="full" isTruncated fontWeight="semibold">
+                              {tasksUnread.includes(task.id) && (
+                                <>
+                                  <Circle
+                                    size="2"
+                                    bg={dotBg}
+                                    display="inline-block"
+                                  />{' '}
+                                </>
+                              )}
+                              {task.title}
                             </Text>
+                          </LinkOverlay>
+                          {task.labels.length > 0 && (
+                            <HStack>
+                              {' '}
+                              <Badge>{task.labels[0]}</Badge>{' '}
+                              {task.labels.length > 1 && (
+                                <Text fontSize="small" color="gray.500">
+                                  +{task.labels.length - 1}
+                                </Text>
+                              )}
+                            </HStack>
                           )}
-                        </HStack>
-                      )}
-                      <Text
-                        w="full"
-                        color="gray.500"
-                        fontStyle="italic"
-                        fontSize="sm"
-                        isTruncated
-                      >
-                        {task.description}
-                      </Text>
+                          <Text
+                            w="full"
+                            color="gray.500"
+                            fontStyle="italic"
+                            fontSize="sm"
+                            isTruncated
+                          >
+                            {task.description}
+                          </Text>
 
-                      <Flex w="full" flexGrow={1} alignItems="center">
-                        <Tooltip hasArrow label={task.dev.name}>
-                          <Avatar size="xs" src={task.dev.avatar} />
-                        </Tooltip>
-                        <Spacer />
-                        <Text fontSize="xs" fontStyle="italic">
-                          {task.startDate &&
-                            task.dueDate &&
-                            `${
-                              new Date(task.startDate)
-                                .toLocaleString('en-GB')
-                                .split(',')[0]
-                            } -  ${
-                              new Date(task.dueDate)
-                                .toLocaleString('en-GB')
-                                .split(',')[0]
-                            }`}
-                          {!task.startDate &&
-                            task.dueDate &&
-                            `Due: ${
-                              new Date(task.dueDate)
-                                .toLocaleString('en-GB')
-                                .split(',')[0]
-                            }`}
-                        </Text>
-                      </Flex>
-                    </Flex>
-                  </LinkBox>
-                );
-              }
-              return taskList;
-            }, [])}
-          </VStack>
-        ))}
-      </HStack>
+                          <Flex w="full" flexGrow={1} alignItems="center">
+                            <Tooltip hasArrow label={task.dev.name}>
+                              <Avatar size="xs" src={task.dev.avatar} />
+                            </Tooltip>
+                            <Spacer />
+                            <Text fontSize="xs" fontStyle="italic">
+                              {task.startDate &&
+                                task.dueDate &&
+                                `${
+                                  new Date(task.startDate)
+                                    .toLocaleString('en-GB')
+                                    .split(',')[0]
+                                } -  ${
+                                  new Date(task.dueDate)
+                                    .toLocaleString('en-GB')
+                                    .split(',')[0]
+                                }`}
+                              {!task.startDate &&
+                                task.dueDate &&
+                                `Due: ${
+                                  new Date(task.dueDate)
+                                    .toLocaleString('en-GB')
+                                    .split(',')[0]
+                                }`}
+                            </Text>
+                          </Flex>
+                        </Flex>
+                      </LinkBox>
+                    );
+                  }
+                  return taskList;
+                }, [])}
+              </VStack>
+            </Box>
+          ))}
+        </HStack>
+      </Box>
       <Modal
         initialFocusRef={initialRef}
         isOpen={detailsIsOpen}
@@ -1227,6 +1258,23 @@ export const TasksArea = () => {
               taskValues={modalValues}
               members={project.members}
               onClose={editOnClose}
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={addColumnIsOpen}
+        onClose={addColumnOnClose}
+        size="3xl"
+        scrollBehavior="outside"
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          <ModalBody>
+            <AddColumnForm
+              columns={project.taskColumns}
+              onClose={addColumnOnClose}
             />
           </ModalBody>
         </ModalContent>
