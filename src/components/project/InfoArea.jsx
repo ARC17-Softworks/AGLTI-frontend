@@ -211,7 +211,13 @@ export const InfoArea = props => {
           {authContext.profile.projectOwner ? (
             <Tooltip hasArrow label="Edit Project">
               <IconButton
-                onClick={onEditOpen}
+                onClick={() => {
+                  setValues({
+                    title: project.title,
+                    description: project.description,
+                  });
+                  onEditOpen();
+                }}
                 icon={<EditIcon />}
                 variant="outline"
               />
